@@ -38,7 +38,7 @@ public class ActivitySeeResults extends ListActivity {
 
 		super.onCreate(savedInstanceState);
 
-		typeOfDish = " " + this.getIntent().getStringExtra("Type") + " ";
+		typeOfDish = this.getIntent().getStringExtra("Type");
 		ingredientAId = this.getIntent().getLongExtra("IngredientA", -1);
 		ingredientBId = this.getIntent().getLongExtra("IngredientB", -1);
 		ingredientCId = this.getIntent().getLongExtra("IngredientC", -1);
