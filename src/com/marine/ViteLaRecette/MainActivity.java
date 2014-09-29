@@ -38,6 +38,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	static MesureDao mesureDao;
 
 	private Button buttonPersonalSearch;
+    private Button buttonAllRecipes;
 	private Intent intent;
 
 	@Override
@@ -48,6 +49,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		buttonPersonalSearch = (Button) findViewById(R.id.buttonPersonalSearchID);
 		buttonPersonalSearch.setOnClickListener(this);
+
+        buttonAllRecipes = (Button) findViewById(R.id.buttonAllRecipesID);
+        buttonAllRecipes.setOnClickListener(this);
 
 		importBdd();
 
@@ -86,7 +90,16 @@ public class MainActivity extends Activity implements OnClickListener {
                 startActivity(intent);
                 break;
 
-		}
+            case R.id.buttonAllRecipesID:
+                intent = new Intent(MainActivity.this,
+                        ActivityAllRecipes.class);
+                startActivity(intent);
+                break;
+
+
+
+
+        }
 
 	}
 

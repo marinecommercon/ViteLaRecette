@@ -56,7 +56,7 @@ public class ActivitySeeResults extends ListActivity {
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		id = listRecipes.get(position).getId();
-		Intent intent = new Intent(ActivitySeeResults.this,ActiviteDetailRecette.class);
+		Intent intent = new Intent(ActivitySeeResults.this,ActivityDetailRecipe.class);
 		intent.putExtra("ID", (int) id);
 		startActivity(intent);
 	}
@@ -65,8 +65,8 @@ public class ActivitySeeResults extends ListActivity {
 	private void putInOrder(List<Recette> list, int p1, int p2, int p3, int p4) {
 
 		int i = 0;
-		int place = 0;
-		Recette recTemp = null;
+		int place;
+		Recette recTemp;
 
 		while (i < list.size()) {
 
@@ -115,10 +115,10 @@ public class ActivitySeeResults extends ListActivity {
 			return R1.getScore() > R2.getScore();
 
 		case 'I' + 2:
-			return R1.getScore() == R2.getScore();
+			return R1.getScore().equals(R2.getScore());
 
 		case 'I' + 3:
-			return R1.getScore() == R2.getScore();
+			return R1.getScore().equals(R2.getScore());
 
 		case 'T':
 			return R1.getCuisson() + R1.getPreparation() > R2.getCuisson()
@@ -143,10 +143,10 @@ public class ActivitySeeResults extends ListActivity {
 			return R1.getDifficulte() < R2.getDifficulte();
 
 		case 'D' + 2:
-			return R1.getDifficulte() == R2.getDifficulte();
+			return R1.getDifficulte().equals(R2.getDifficulte());
 
 		case 'D' + 3:
-			return R1.getDifficulte() == R2.getDifficulte();
+			return R1.getDifficulte().equals(R2.getDifficulte());
 
 		case 'P':
 			return R1.getPrix() > R2.getPrix();
@@ -155,10 +155,10 @@ public class ActivitySeeResults extends ListActivity {
 			return R1.getPrix() < R2.getPrix();
 
 		case 'P' + 2:
-			return R1.getPrix() == R2.getPrix();
+			return R1.getPrix().equals(R2.getPrix());
 
 		case 'P' + 3:
-			return R1.getPrix() == R2.getPrix();
+			return R1.getPrix().equals(R2.getPrix());
 
 		default:
 			return false;

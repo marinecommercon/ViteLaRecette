@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,9 +30,6 @@ public class ActiviteListeCourses extends Activity implements OnClickListener {
 	private AdapterCourses adapter;
 	private List<Liste> courses;
 	ArrayList<Quantite> quantite;
-	ArrayList<String> quantites;
-	ArrayAdapter<?> adapterQ;
-
 	private TextView info1;
 	private int[] listeNbInitial = new int[200];// Tableau de taille NT pour les
 												// diff�rents
@@ -107,7 +103,7 @@ public class ActiviteListeCourses extends Activity implements OnClickListener {
 								// User clicked OK button
 								Intent intent1 = new Intent(
 										ActiviteListeCourses.this,
-										ActiviteDetailRecette.class);
+										ActivityDetailRecipe.class);
 								intent1.putExtra("ID", listeRecettes.get(arg2)
 										.getId().intValue());
 

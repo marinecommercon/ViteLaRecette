@@ -180,7 +180,7 @@ public class ActivitePreferences extends Activity {
 							public void onClick(DialogInterface dialog, int id) {
 								Intent intent1 = new Intent(
 										ActivitePreferences.this,
-										ActiviteDetailRecette.class);
+										ActivityDetailRecipe.class);
 								intent1.putExtra("ID", listeRecettes.get(arg2)
 										.getId());
 								startActivity(intent1);
