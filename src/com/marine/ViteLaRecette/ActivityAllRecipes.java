@@ -19,10 +19,10 @@ public class ActivityAllRecipes extends ListActivity {
 	private String orderBy;
 	private SimpleCursorAdapter adapter;
     private int position;
-    int globalHeight;
-    double letterHeight;
+    private int globalHeight;
+    private double letterHeight;
     private Recette recipe;
-
+    private String[] alphabeticalList = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
 
 
     @Override
@@ -80,6 +80,7 @@ public class ActivityAllRecipes extends ListActivity {
 
 
     private void addLetters(){
+
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
@@ -87,21 +88,20 @@ public class ActivityAllRecipes extends ListActivity {
         letterHeight = Math.floor((double) (globalHeight/27 * 10)) / 10;
 
         LinearLayout linearLayoutLetters = (LinearLayout) findViewById(R.id.linearLayoutLettersID);
-        String[] alphabeticalList = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
 
-        final TextView[] tx = new TextView[26];
+        final TextView[] textViewLetter = new TextView[26];
                 for(int i=0; i<26; i++) {
-                    tx[i] = new TextView(this);
-                    tx[i].setHeight((int) letterHeight);
-                    tx[i].setText(alphabeticalList[i].toString());
-                    tx[i].setTextSize(15);
-                    tx[i].setGravity(Gravity.CENTER_HORIZONTAL);
-                    tx[i].setTag(alphabeticalList[i].toString());
-                    linearLayoutLetters.addView(tx[i]);
-                    tx[i].setOnClickListener(new View.OnClickListener() {
+                    textViewLetter[i] = new TextView(this);
+                    textViewLetter[i].setHeight((int) letterHeight);
+                    textViewLetter[i].setText(alphabeticalList[i].toString());
+                    textViewLetter[i].setTextSize(15);
+                    textViewLetter[i].setGravity(Gravity.CENTER_HORIZONTAL);
+                    textViewLetter[i].setTag(alphabeticalList[i].toString());
+                    linearLayoutLetters.addView(textViewLetter[i]);
+                    textViewLetter[i].setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    findPosition(v);
+                                    findPosition(v, null);
                                     }
                             });
 
@@ -109,28 +109,32 @@ public class ActivityAllRecipes extends ListActivity {
     }
 
 
-    private void findPosition(View v) {
+    private void findPosition(View v, String tag) {
         int i =0;
-
 
         recipe = MainActivity.recetteDao.queryBuilder()
                 .where(RecetteDao.Properties.Id.eq(getListAdapter().getItemId(0)))
                 .unique();
 
-        while(!recipe.getNom().substring(0, 1).equals(v.getTag()) && i < getListView().getCount()) {
+        if(!v.equals(null)) {
+            while (!recipe.getNom().substring(0, 1).equals(v.getTag()) && i < getListView().getCount()) {
 
-            i=i+1;
-            recipe = MainActivity.recetteDao.queryBuilder()
-                    .where(RecetteDao.Properties.Id.eq(getListAdapter().getItemId(i)))
-                    .unique();
+                i = i + 1;
+                recipe = MainActivity.recetteDao.queryBuilder()
+                        .where(RecetteDao.Properties.Id.eq(getListAdapter().getItemId(i)))
+                        .unique();
+            }
         }
+
         if (i>=getListView().getCount()){
+
             Toast toast = Toast.makeText(getApplicationContext(), "Desole, \nPas de recette pour cette lettre", Toast.LENGTH_SHORT);
             toast.show();
         }
         else{
             getListView().setSelection(i);}
     }
+
 
     @Override
 		protected void onStop() {

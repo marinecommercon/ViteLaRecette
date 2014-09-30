@@ -31,7 +31,7 @@ public class ActivityDetailRecipe extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		int iDRecette = this.getIntent().getIntExtra("ID", 0);
 
-		setContentView(R.layout.activity_detail);
+		setContentView(R.layout.activity_detail_recipe);
 
 		recipe = MainActivity.recetteDao.queryBuilder()
 				.where(Properties.Id.eq(iDRecette))

@@ -15,11 +15,17 @@
             android:layout_height="50dp"
             android:text="buttonPersonalSearch"/>
 
-    <Button
-            android:id="@+id/buttonAllRecipesID"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:text="buttonAllRecipes"/>
+        <Button
+                android:id="@+id/buttonAllRecipesID"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:text="buttonAllRecipes"/>
+
+        <Button
+                android:id="@+id/buttonTestID"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:text="buttonTest"/>
 
 </LinearLayout>
 </RelativeLayout>

@@ -23,7 +23,8 @@
         </activity>
 
         <activity android:name=".ActivityAllRecipes"
-                  android:theme="@android:style/Theme.NoTitleBar">
+                  android:theme="@android:style/Theme.NoTitleBar"
+                  android:screenOrientation="portrait">
         </activity>
 
         <activity android:name=".ActivityDetailRecipe"
@@ -49,6 +50,11 @@
         <activity android:name="ActiviteAjoutRecette"
                   android:theme="@android:style/Theme.NoTitleBar">
         </activity>
+
+        <activity android:name=".ActivityTointeger"
+                  android:theme="@android:style/Theme.NoTitleBar">
+        </activity>
+
 
 
 

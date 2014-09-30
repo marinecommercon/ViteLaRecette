@@ -39,6 +39,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private Button buttonPersonalSearch;
     private Button buttonAllRecipes;
+    private Button buttonTest;
 	private Intent intent;
 
 	@Override
@@ -52,6 +53,10 @@ public class MainActivity extends Activity implements OnClickListener {
 
         buttonAllRecipes = (Button) findViewById(R.id.buttonAllRecipesID);
         buttonAllRecipes.setOnClickListener(this);
+
+        buttonTest = (Button) findViewById(R.id.buttonTestID);
+        buttonTest.setOnClickListener(this);
+
 
 		importBdd();
 
@@ -93,6 +98,12 @@ public class MainActivity extends Activity implements OnClickListener {
             case R.id.buttonAllRecipesID:
                 intent = new Intent(MainActivity.this,
                         ActivityAllRecipes.class);
+                startActivity(intent);
+                break;
+
+            case R.id.buttonTestID:
+                intent = new Intent(MainActivity.this,
+                        ActivityTointeger.class);
                 startActivity(intent);
                 break;
 
