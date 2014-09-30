@@ -50,9 +50,6 @@
                   android:theme="@android:style/Theme.NoTitleBar">
         </activity>
 
-        <activity android:name="ActivitySelectRecipe"
-                  android:theme="@android:style/Theme.NoTitleBar">
-        </activity>
 
 
 
