@@ -1,16 +1,14 @@
 package com.marine.ViteLaRecette;
 
 import android.app.ListActivity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
+import com.marine.ViteLaRecette.dao.Recette;
 import com.marine.ViteLaRecette.dao.RecetteDao;
 
 
@@ -23,9 +21,11 @@ public class ActivityAllRecipes extends ListActivity {
     private int position;
     int globalHeight;
     double letterHeight;
+    private Recette recipe;
 
 
-	@Override
+
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
@@ -34,8 +34,8 @@ public class ActivityAllRecipes extends ListActivity {
         addLetters();
 		findRecipes();
 		initList();
-
 	}
+
 
     @Override
     protected void onPause() {
@@ -75,6 +75,7 @@ public class ActivityAllRecipes extends ListActivity {
 		adapter = new SimpleCursorAdapter(this, R.layout.activity_all_recipes_list, cursor, from, to);
 		setListAdapter(adapter);
 
+
        }
 
 
@@ -83,23 +84,53 @@ public class ActivityAllRecipes extends ListActivity {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
         globalHeight = metrics.heightPixels;
-        letterHeight = Math.floor((double) (globalHeight/26 * 10)) / 10;
+        letterHeight = Math.floor((double) (globalHeight/27 * 10)) / 10;
 
         LinearLayout linearLayoutLetters = (LinearLayout) findViewById(R.id.linearLayoutLettersID);
         String[] alphabeticalList = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
 
-        TextView[] tx = new TextView[26];
-        for(int i=0; i<25; i++) {
-            tx[i] = new TextView(this);
-            tx[i].setHeight((int) letterHeight);
-            tx[i].setText(alphabeticalList[i].toString());
-            tx[i].setTag(alphabeticalList[i].toString());
-            linearLayoutLetters.addView(tx[i]);
+        final TextView[] tx = new TextView[26];
+                for(int i=0; i<26; i++) {
+                    tx[i] = new TextView(this);
+                    tx[i].setHeight((int) letterHeight);
+                    tx[i].setText(alphabeticalList[i].toString());
+                    tx[i].setTextSize(15);
+                    tx[i].setGravity(Gravity.CENTER_HORIZONTAL);
+                    tx[i].setTag(alphabeticalList[i].toString());
+                    linearLayoutLetters.addView(tx[i]);
+                    tx[i].setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    findPosition(v);
+                                    }
+                            });
 
-        }
+                }
     }
 
 
+    private void findPosition(View v) {
+        int i =0;
+
+
+        recipe = MainActivity.recetteDao.queryBuilder()
+                .where(RecetteDao.Properties.Id.eq(getListAdapter().getItemId(0)))
+                .unique();
+
+        while(!recipe.getNom().substring(0, 1).equals(v.getTag()) && i < getListView().getCount()) {
+
+            i=i+1;
+            recipe = MainActivity.recetteDao.queryBuilder()
+                    .where(RecetteDao.Properties.Id.eq(getListAdapter().getItemId(i)))
+                    .unique();
+        }
+        if (i>=getListView().getCount()){
+            Toast toast = Toast.makeText(getApplicationContext(), "Desole, \nPas de recette pour cette lettre", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        else{
+            getListView().setSelection(i);}
+    }
 
     @Override
 		protected void onStop() {
