@@ -103,7 +103,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
             case R.id.buttonTestID:
                 intent = new Intent(MainActivity.this,
-                        ActivityTointeger.class);
+                        ActivityAddRecipeStep1.class);
                 startActivity(intent);
                 break;
 

@@ -1,11 +1,14 @@
 package com.marine.ViteLaRecette;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -16,51 +19,61 @@ import com.marine.ViteLaRecette.dao.Quantite;
 import com.marine.ViteLaRecette.dao.Recette;
 import com.marine.ViteLaRecette.dao.RecetteDao.Properties;
 
-public class ActivityDetailRecipe extends Activity implements OnClickListener {
+public class ActivityDetailRecipe extends Activity {
 
-	private Button buttonAddShoplist;
-	private Button buttonFavorites;
-	private Recette recipe;
+    private Button buttonAddShoplist;
+    private Button buttonFavorites;
+    private Button buttonGoToSteps;
+    private Recette recipe;
 
 
+    private final String TAG = getClass().getSimpleName().toString();
+    private ArrayList<HashMap<String, Object>> mList = new ArrayList<HashMap<String, Object>>();
+    private SharedPreferences prefs;
+    private int recetteID = 0;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		int iDRecette = this.getIntent().getIntExtra("ID", 0);
+    private ArrayList<String> listDescription;
+    private ListView listViewIngredients;
+    private ListView listViewDescriptionItems;
 
-		setContentView(R.layout.activity_detail_recipe);
 
-		recipe = MainActivity.recetteDao.queryBuilder()
-				.where(Properties.Id.eq(iDRecette))
-				.unique();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		final List <Quantite> listOfIngredients = MainActivity.quantiteDao._queryRecette_QuantDeRec(iDRecette);
-		final ArrayList <String> quantities = new ArrayList();
-		final int listOfIngredientsSize=listOfIngredients.size();
+        prefs = this.getSharedPreferences(TAG, MODE_PRIVATE);
+        recetteID = this.getIntent().getIntExtra("ID", 0);
+        setContentView(R.layout.activity_detail_recipe);
+
+        recipe = MainActivity.recetteDao.queryBuilder()
+                .where(Properties.Id.eq(recetteID))
+                .unique();
+
+        final List<Quantite> listOfIngredients = MainActivity.quantiteDao._queryRecette_QuantDeRec(recetteID);
+        final ArrayList<String> quantities = new ArrayList();
+        final int listOfIngredientsSize = listOfIngredients.size();
 
         //Initialization of UI
 
-        TextView recipeName = (TextView)findViewById(R.id.textViewNameID);
-        TextView recipeCookingTime = (TextView)findViewById(R.id.textViewCookingTimeID);
-        TextView recipePreparationTime = (TextView)findViewById(R.id.textViewPreparationTimeID);
-        TextView recipeLevel = (TextView)findViewById(R.id.textViewLevelID);
-        TextView recipePrice = (TextView)findViewById(R.id.textViewPriceID);
-        TextView recipeDescription = (TextView)findViewById(R.id.textViewDescriptionID);
+        TextView recipeName = (TextView) findViewById(R.id.textViewNameID);
+        TextView recipeCookingTime = (TextView) findViewById(R.id.textViewCookingTimeID);
+        TextView recipePreparationTime = (TextView) findViewById(R.id.textViewPreparationTimeID);
+        TextView recipeLevel = (TextView) findViewById(R.id.textViewLevelID);
+        TextView recipePrice = (TextView) findViewById(R.id.textViewPriceID);
 
+        listViewIngredients = (ListView) findViewById(R.id.listViewIngredientsID);
+        listViewDescriptionItems = (ListView) findViewById(R.id.listViewDescriptionItemsID);
 
         recipeName.setText(recipe.getNom());
         recipeCookingTime.setText("Temps de cuisson : " + recipe.getCuisson() + " min");
         recipePreparationTime.setText("Temps de preparation : " + recipe.getPreparation());
         recipeLevel.setText("Difficulte : " + recipe.getDifficulte());
         recipePrice.setText("Cout : " + recipe.getPrix());
-        recipeDescription.setText("" + recipe.getDescription());
-
 
 
         //Initialization List of ingredients
 
-        final ListView listViewIngredients = (ListView)findViewById(R.id.listViewIngredientsID);
+        final ListView listViewIngredients = (ListView) findViewById(R.id.listViewIngredientsID);
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.item_petit, quantities);
         listViewIngredients.setAdapter(adapter);
 
@@ -68,32 +81,23 @@ public class ActivityDetailRecipe extends Activity implements OnClickListener {
 
         listViewIngredients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-              @Override
-              public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2,
-                                      long arg3) {
-                  alertDialogClickOnIngredient(arg2, listOfIngredients);
-              }
-          });
-
-
-        //Initialization
-
-        parserDescription((String) recipe.getDescription().toString());
-
-
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2,
+                                    long arg3) {
+                alertDialogClickOnIngredient(arg2, listOfIngredients);
+            }
+        });
 
 
         //Handel errors
 
         final AlertDialog alertDialogWrongNumber = new AlertDialog.Builder(ActivityDetailRecipe.this).create();
         alertDialogWrongNumber.setMessage("Le nombre entre n'est pas correct");
-        alertDialogWrongNumber.setButton(DialogInterface.BUTTON_POSITIVE,"Ok", new DialogInterface.OnClickListener() {
+        alertDialogWrongNumber.setButton(DialogInterface.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 return;
             }
         });
-
-
 
 
         //Button AddShoplist
@@ -104,7 +108,7 @@ public class ActivityDetailRecipe extends Activity implements OnClickListener {
         final EditText numberChoosenByUser = new EditText(ActivityDetailRecipe.this);
         numberChoosenByUser.setInputType(InputType.TYPE_CLASS_NUMBER);
 
-        buttonAddShoplist = (Button)findViewById(R.id.buttonAddShoplistID);
+        buttonAddShoplist = (Button) findViewById(R.id.buttonAddShoplistID);
         buttonAddShoplist.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -114,26 +118,25 @@ public class ActivityDetailRecipe extends Activity implements OnClickListener {
         });
 
 
-       // Button AddShoplist => Adapt the quantities
+        // Button AddShoplist => Adapt the quantities
 
         alertDialogChangeQuantity.setView(numberChoosenByUser);
-        alertDialogChangeQuantity.setButton(DialogInterface.BUTTON_POSITIVE,"Ajuster les quantites", new DialogInterface.OnClickListener() {
+        alertDialogChangeQuantity.setButton(DialogInterface.BUTTON_POSITIVE, "Ajuster les quantites", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 String numberString = numberChoosenByUser.getText().toString().trim();
                 int numberInt = Integer.parseInt(numberString);
-                int FirstNumberInt=-1;
+                int FirstNumberInt = -1;
 
-                if(numberString.length()>0) {
+                if (numberString.length() > 0) {
                     String firstNumberString = numberChoosenByUser.getText().toString().trim().substring(0, 1);
                     FirstNumberInt = Integer.parseInt(firstNumberString);
                 }
 
-                if (numberString.equals("") || numberString.equals("0") || numberInt<=0 || FirstNumberInt==0 ) {
+                if (numberString.equals("") || numberString.equals("0") || numberInt <= 0 || FirstNumberInt == 0) {
                     alertDialogWrongNumber.show();
                     numberChoosenByUser.getText().clear();
-                }
-                else {
+                } else {
                     quantities.clear();
                     for (int i = 0; i < listOfIngredientsSize; i++) {
                         double quantityModified = Math.floor(((double) (listOfIngredients.get(i).getQuantite() * numberInt / listOfIngredients.get(i).getRecette().getNombre()) * 10)) / 10;
@@ -157,23 +160,22 @@ public class ActivityDetailRecipe extends Activity implements OnClickListener {
 
         // Button AddShoplist => Adapt and add to the shoplist
 
-        alertDialogChangeQuantity.setButton(DialogInterface.BUTTON_NEGATIVE,"Ajouter a la \n liste de course", new DialogInterface.OnClickListener() {
+        alertDialogChangeQuantity.setButton(DialogInterface.BUTTON_NEGATIVE, "Ajouter a la \n liste de course", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 String numberString = numberChoosenByUser.getText().toString().trim();
                 int numberInt = Integer.parseInt(numberString);
-                int FirstNumberInt=-1;
+                int FirstNumberInt = -1;
 
-                if(numberString.length()>0) {
+                if (numberString.length() > 0) {
                     String firstNumberString = numberChoosenByUser.getText().toString().trim().substring(0, 1);
                     FirstNumberInt = Integer.parseInt(firstNumberString);
                 }
 
-                if (numberString.equals("") || numberString.equals("0") || numberInt<=0 || FirstNumberInt==0 ) {
+                if (numberString.equals("") || numberString.equals("0") || numberInt <= 0 || FirstNumberInt == 0) {
                     alertDialogWrongNumber.show();
                     numberChoosenByUser.getText().clear();
-                }
-                else {
+                } else {
                     quantities.clear();
                     for (int i = 0; i < listOfIngredientsSize; i++) {
                         double ajustedQuantity = Math.floor(((double) (listOfIngredients.get(i).getQuantite() * numberInt / listOfIngredients.get(i).getRecette().getNombre()) * 10)) / 10;
@@ -197,10 +199,9 @@ public class ActivityDetailRecipe extends Activity implements OnClickListener {
         });
 
 
-
         // Button Favorites
 
-        buttonFavorites = (Button)findViewById(R.id.buttonFavoritesID);
+        buttonFavorites = (Button) findViewById(R.id.buttonFavoritesID);
         changeStateButtonFavorites();
         buttonFavorites.setOnClickListener(new OnClickListener() {
             @Override
@@ -226,47 +227,56 @@ public class ActivityDetailRecipe extends Activity implements OnClickListener {
 
 
 
+        buttonGoToSteps = (Button)findViewById(R.id.buttonGoToStepsID);
+        buttonGoToSteps.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ActivityDetailRecipe.this,
+                        ActivityDetailRecipeSteps.class);
+                intent.putExtra("ID",recetteID);
+                startActivity(intent);
+            }
+        });
 
 
     }
 
 
+    public void initQuantity(List<Quantite> quantite, ArrayList<String> quantites) {
 
-    public void initQuantity(List <Quantite> quantite, ArrayList <String> quantites){
+        for (int i = 0; i < quantite.size(); i++) {
+            String Q = "" + quantite.get(i).getQuantite();
+            String S = "" + quantite.get(i).getSuffixe();
 
-        for(int i = 0; i<quantite.size() ;i++){
-            String Q=""+quantite.get(i).getQuantite();
-            String S=""+quantite.get(i).getSuffixe();
-
-            if(quantite.get(i).getQuantite()==0.0){
-                Q="";
+            if (quantite.get(i).getQuantite() == 0.0) {
+                Q = "";
             }
-            if(S.trim().equals("null")){
-                S="";
+            if (S.trim().equals("null")) {
+                S = "";
             }
-            quantites.add((String)(Q+" "+quantite.get(i).getMesure().getNom()+quantite.get(i).getIngredient().getNom()+" "+S));
+            quantites.add((String) (Q + " " + quantite.get(i).getMesure().getNom() + quantite.get(i).getIngredient().getNom() + " " + S));
         }
     }
 
-    public void alertDialogClickOnIngredient(int arg2, List <Quantite> quantite){
+    public void alertDialogClickOnIngredient(int arg2, List<Quantite> quantite) {
 
         final int arg = arg2;
-        final List <Quantite> quantiteSelected = quantite;
+        final List<Quantite> quantiteSelected = quantite;
 
         AlertDialog alertDialog = new AlertDialog.Builder(ActivityDetailRecipe.this).create();
 
         alertDialog.setMessage("Ingredient : " + quantite.get(arg2).getIngredient().getNom() + "\nCategorie : " + quantite.get(arg2).getIngredient().getCategorie().getNom());
-        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE,"Retour", new DialogInterface.OnClickListener() {
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Retour", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
             }
         });
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,"Bannir l'ingredient", new DialogInterface.OnClickListener() {
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Bannir l'ingredient", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 quantiteSelected.get(arg).getIngredient().setFavoris(-1);
                 MainActivity.ingredientDao.update(quantiteSelected.get(arg).getIngredient());
             }
         });
-        alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL,"Restaurer l'ingredient", new DialogInterface.OnClickListener() {
+        alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Restaurer l'ingredient", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 quantiteSelected.get(arg).getIngredient().setFavoris(0);
                 MainActivity.ingredientDao.update(quantiteSelected.get(arg).getIngredient());
@@ -275,63 +285,19 @@ public class ActivityDetailRecipe extends Activity implements OnClickListener {
         alertDialog.show();
     }
 
-    private void changeStateButtonFavorites(){
-            switch(recipe.getFavoris()){
-                case -1:
-                    buttonFavorites.setBackgroundColor(getResources().getColor(R.color.red));
-                    break;
-                case 0:
-                    buttonFavorites.setBackgroundColor(getResources().getColor(R.color.blue));
-                    break;
-                case 1:
-                    buttonFavorites.setBackgroundColor(getResources().getColor(R.color.yellow));
-                    break;
-            }
+
+    private void changeStateButtonFavorites() {
+        switch (recipe.getFavoris()) {
+            case -1:
+                buttonFavorites.setBackgroundColor(getResources().getColor(R.color.red));
+                break;
+            case 0:
+                buttonFavorites.setBackgroundColor(getResources().getColor(R.color.blue));
+                break;
+            case 1:
+                buttonFavorites.setBackgroundColor(getResources().getColor(R.color.yellow));
+                break;
         }
-
-    private void parserDescription(String description){
-
-    System.out.println(description);
-    System.out.println(description.length());
-
-        String itemDescription;
-        ArrayList <String> listDescription = new ArrayList<String>();
-        int cursorDescription = 0;
-        int descriptionLength = description.length();
-
-        while (descriptionLength>0){
-
-
-            if(description.substring(cursorDescription,cursorDescription+1).equals(".")){
-
-                itemDescription = description.substring(0,cursorDescription+1);
-                listDescription.add(itemDescription);
-
-                //Delete the item from the Description
-                description = description.substring(cursorDescription+1,description.length());
-
-                //Calculate the new length
-                descriptionLength = description.length();
-
-                //Reinitialize the cursor
-                cursorDescription=0;
-
-            }
-
-            else{
-                cursorDescription = cursorDescription+1;
-            }
-        }
-
-
-
-
-
     }
-
-    @Override
-    public void onClick(View arg0) {
-    }
-
 
 }
