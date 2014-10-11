@@ -64,11 +64,11 @@ public class ActivityAddRecipeStep1 extends Activity {
         List<String> listType = new ArrayList<String>();
 
         listType.add("Plat principal");
-        listType.add("Entree");
+        listType.add("Entrée");
         listType.add("Dessert");
         listType.add("Sauce");
         listType.add("Accompagnement");
-        listType.add("Aperitif");
+        listType.add("Apéritif");
         listType.add("Boisson");
 
         ArrayAdapter<String> dataAdapterType = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listType);
@@ -92,7 +92,7 @@ public class ActivityAddRecipeStep1 extends Activity {
         listDifficulty.add("Facile");
         listDifficulty.add("Moyen");
         listDifficulty.add("Difficile");
-        listDifficulty.add("Tres difficle");
+        listDifficulty.add("Très difficle");
 
         ArrayAdapter<String> dataAdapterDifficulty = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listDifficulty);
         dataAdapterDifficulty.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -103,7 +103,7 @@ public class ActivityAddRecipeStep1 extends Activity {
         spinnerPrice = (Spinner) findViewById(R.id.spinnerPrice);
         List<String> listPrice = new ArrayList<String>();
 
-        listPrice.add("Bon marche");
+        listPrice.add("Bon marché");
         listPrice.add("Moyen");
         listPrice.add("Tres cher");
 
@@ -170,18 +170,18 @@ public class ActivityAddRecipeStep1 extends Activity {
         errorDoc = "";
 
         if(name.equals("")){
-            errorDoc = errorDoc + "\n-Le nom de la recette";
+            errorDoc = errorDoc + "\n- Le nom de la recette";
             editTextName.getText().clear();
         }
 
         if(number.equals("") || number.equals("0")){
-            errorDoc = errorDoc + "\n-Le nombre de personnes";
+            errorDoc = errorDoc + "\n- Le nombre de personnes";
             editTextNumber.getText().clear();
         }
 
         if(timePrepa.equals("") && timeCooking.equals("") || timePrepa.equals("0") && timeCooking.equals("0") ||
            timePrepa.equals("") && timeCooking.equals("0") || timePrepa.equals("0") && timeCooking.equals("") ){
-            errorDoc = errorDoc + "\n-Au moins un temps de preparation ou de cuisson";
+            errorDoc = errorDoc + "\n- Au moins un temps de préparation ou de cuisson";
 
             editTextTimePrepa.getText().clear();
             editTextTimeCooking.getText().clear();
@@ -196,11 +196,25 @@ public class ActivityAddRecipeStep1 extends Activity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("ADD_RECIPE_NAME", name);
         editor.putString("ADD_RECIPE_TYPE", type);
-        editor.putString("ADD_RECIPE_NUMBER", number);
-        editor.putString("ADD_RECIPE_TIMEPREPA", number);
-        editor.putString("ADD_RECIPE_TIMECOOKING", number);
+        editor.putInt("ADD_RECIPE_NUMBER", Integer.parseInt(number));
+
+        //timePrepa becomes integer
+        if(timePrepa.equals("")){
+            editor.putInt("ADD_RECIPE_TIMEPREPA", 0);
+        }else{
+            editor.putInt("ADD_RECIPE_TIMEPREPA", Integer.parseInt(timePrepa));
+        }
+
+        //timeCooking becomes integer
+        if(timeCooking.equals("")){
+            editor.putInt("ADD_RECIPE_TIMECOOKING", 0);
+        }else{
+            editor.putInt("ADD_RECIPE_TIMECOOKING", Integer.parseInt(timeCooking));
+        }
+
         editor.putString("ADD_RECIPE_DIFFICULTY", difficulty);
         editor.putString("ADD_RECIPE_PRICE", price);
+
         editor.commit();
     }
 
@@ -211,9 +225,9 @@ public class ActivityAddRecipeStep1 extends Activity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("ADD_RECIPE_NAME", "");
         editor.putString("ADD_RECIPE_TYPE", "");
-        editor.putString("ADD_RECIPE_NUMBER", "");
-        editor.putString("ADD_RECIPE_TIMEPREPA", "");
-        editor.putString("ADD_RECIPE_TIMECOOKING", "");
+        editor.putInt("ADD_RECIPE_NUMBER", 0);
+        editor.putInt("ADD_RECIPE_TIMEPREPA", 0);
+        editor.putInt("ADD_RECIPE_TIMECOOKING", 0);
         editor.putString("ADD_RECIPE_DIFFICULTY", "");
         editor.putString("ADD_RECIPE_PRICE", "");
         editor.commit();

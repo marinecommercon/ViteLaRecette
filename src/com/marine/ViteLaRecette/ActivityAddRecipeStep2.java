@@ -43,6 +43,10 @@ public class ActivityAddRecipeStep2 extends Activity {
         });
 
         System.out.println(getSharedPreferences("ADD_RECIPE",0).getString("ADD_RECIPE_NAME", null));
+        System.out.println(getSharedPreferences("ADD_RECIPE",0).getInt("ADD_RECIPE_NUMBER", 0));
+        System.out.println(getSharedPreferences("ADD_RECIPE",0).getInt("ADD_RECIPE_TIMEPREPA", 0));
+        System.out.println(getSharedPreferences("ADD_RECIPE",0).getInt("ADD_RECIPE_TIMECOOKING", 0));
+        System.out.println(getSharedPreferences("ADD_RECIPE",0).getString("ADD_RECIPE_PRICE", null));
 
 
     }
