@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="80">
+
+
+        <LinearLayout
+                      android:orientation="vertical"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent">
+
+            <TextView
+                    android:id="@+id/textviewName"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nom de la recette"/>
+
+            <EditText
+                    android:id="@+id/edittextName"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/textviewType"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Type de recette"/>
+
+            <Spinner
+                    android:id="@+id/spinnerType"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"/>
+
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                <TextView
+                        android:id="@+id/textviewNumber"
+                        android:layout_weight="60"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Nombre de personnes"/>
+
+                <EditText
+                        android:id="@+id/edittextNumber"
+                        android:layout_weight="40"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                <TextView
+                        android:id="@+id/textviewTimePrepa"
+                        android:layout_weight="60"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Temps de preparation"/>
+
+                <EditText
+                        android:id="@+id/edittextTimePrepa"
+                        android:layout_weight="40"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                <TextView
+                        android:id="@+id/textviewTimeCooking"
+                        android:layout_weight="60"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Temps de cuisson"/>
+
+                <EditText
+                        android:id="@+id/edittextTimeCooking"
+                        android:layout_weight="40"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                <TextView
+                        android:id="@+id/textviewDifficulty"
+                        android:layout_weight="50"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Difficulte"/>
+
+                <Spinner
+                        android:id="@+id/spinnerDifficulty"
+                        android:layout_weight="50"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                <TextView
+                        android:id="@+id/textviewPrice"
+                        android:layout_weight="50"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Prix"/>
+
+                <Spinner
+                        android:id="@+id/spinnerPrice"
+                        android:layout_weight="50"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+
+
+
+
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+            android:id="@+id/buttonNext"
+            android:layout_weight="20"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Go to step 2"/>
+
+
+</LinearLayout>
