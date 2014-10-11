@@ -64,7 +64,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				null);
 
 		db = helper.getWritableDatabase();
-		
+
 		//Initialisation des Daos
 		daoMaster = new DaoMaster(db);
 		daoSession = daoMaster.newSession();
@@ -103,7 +103,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
             case R.id.buttonTestID:
                 intent = new Intent(MainActivity.this,
-                        ActivityAddRecipeStep1.class);
+                        ActivityAddRecipeStep2.class);
                 startActivity(intent);
                 break;
 

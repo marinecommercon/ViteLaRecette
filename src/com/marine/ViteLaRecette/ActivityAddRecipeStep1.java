@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.text.InputType;
 import android.view.View;
 import android.widget.*;
 
@@ -78,12 +79,15 @@ public class ActivityAddRecipeStep1 extends Activity {
 
         //Number
         editTextNumber = (EditText) findViewById(R.id.edittextNumber);
+        editTextNumber.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         //Time of preparation
         editTextTimePrepa = (EditText) findViewById(R.id.edittextTimePrepa);
+        editTextTimePrepa.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         //Time of cooking
         editTextTimeCooking = (EditText) findViewById(R.id.edittextTimeCooking);
+        editTextTimePrepa.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         //Spinner difficulty
         spinnerDifficulty = (Spinner) findViewById(R.id.spinnerDifficulty);
@@ -217,8 +221,6 @@ public class ActivityAddRecipeStep1 extends Activity {
 
         editor.commit();
     }
-
-
 
     private void resetPrefs(){
         preferences =  getApplicationContext().getSharedPreferences("ADD_RECIPE", 0);
