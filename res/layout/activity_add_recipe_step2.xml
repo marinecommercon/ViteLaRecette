@@ -22,14 +22,14 @@
 
                     <TextView
                             android:id="@+id/textviewQuantity"
-                            android:layout_weight="60"
+                            android:layout_weight="30"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="Quantite"/>
 
                     <EditText
                             android:id="@+id/edittextQuantity"
-                            android:layout_weight="40"
+                            android:layout_weight="70"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"/>
 
@@ -41,15 +41,15 @@
                         android:layout_height="match_parent">
 
                     <TextView
-                            android:id="@+id/textviewUnity"
-                            android:layout_weight="60"
+                            android:id="@+id/textviewUnit"
+                            android:layout_weight="30"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="Unite"/>
 
-                    <EditText
-                            android:id="@+id/edittextUnity"
-                            android:layout_weight="40"
+                    <AutoCompleteTextView
+                            android:id="@+id/autoUnit"
+                            android:layout_weight="70"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"/>
 
@@ -62,14 +62,14 @@
 
                     <TextView
                             android:id="@+id/textviewIngredient"
-                            android:layout_weight="60"
+                            android:layout_weight="30"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Unite"/>
+                            android:text="Ingrédient"/>
 
-                    <EditText
-                            android:id="@+id/edittextIngredient"
-                            android:layout_weight="40"
+                    <AutoCompleteTextView
+                            android:id="@+id/autoIngredient"
+                            android:layout_weight="70"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"/>
 
@@ -80,6 +80,14 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="Ajouter"/>
+
+
+            <ListView
+                android:id="@+id/listviewIngredients"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="none">
+            </ListView>
 
         </LinearLayout>
 
