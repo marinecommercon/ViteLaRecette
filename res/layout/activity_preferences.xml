@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <TextView
+                    android:id="@+id/recettes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recettes Favories :" />
+
+            <ListView
+                    android:id="@+id/recettesList"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+            </ListView>
+
+
+
+            <TextView
+                    android:id="@+id/recettesB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recettes bannies :" />
+
+            <ListView
+                    android:id="@+id/recettesBList"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+            </ListView>
+
+            <TextView
+                    android:id="@+id/ingredients"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ingredients bannis :" />
+
+            <ListView
+                    android:id="@+id/ingredientsList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+            </ListView>
+
+
+
+            <TextView
+                    android:id="@+id/categories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Categories bannies :" />
+
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                <ListView
+                        android:id="@+id/categoriesList"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="80">
+                </ListView>
+
+                <Button
+                        android:id="@+id/boutonAjoutCategorieBannie"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="20"
+                        android:layout_marginRight="0dp"
+                        android:text="Ajouter une catégorie"/>
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

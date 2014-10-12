@@ -16,16 +16,29 @@
             android:text="buttonPersonalSearch"/>
 
         <Button
+                android:id="@+id/buttonAddRecipeID"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:text="buttonAddRecipe"/>
+
+        <Button
+                android:id="@+id/buttonPreferencesID"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:text="buttonPreferences"/>
+
+        <Button
+                android:id="@+id/buttonShoplistID"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:text="buttonShoplist"/>
+
+
+        <Button
                 android:id="@+id/buttonAllRecipesID"
                 android:layout_width="fill_parent"
                 android:layout_height="50dp"
                 android:text="buttonAllRecipes"/>
-
-        <Button
-                android:id="@+id/buttonTestID"
-                android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:text="buttonAddRecipe"/>
 
 </LinearLayout>
 </RelativeLayout>
