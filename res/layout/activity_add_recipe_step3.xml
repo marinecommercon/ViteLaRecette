@@ -25,7 +25,8 @@
             <EditText
                     android:id="@+id/edittextSteps"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="200dp"
+                    android:gravity="top|left"/>
 
 
         </LinearLayout>
@@ -37,6 +38,6 @@
             android:layout_weight="20"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Go to step 4"/>
+            android:text="Visualiser le contenu de la recette"/>
 
 </LinearLayout>
