@@ -21,7 +21,7 @@ import com.marine.ViteLaRecette.dao.Liste;
 import com.marine.ViteLaRecette.dao.Quantite;
 import com.marine.ViteLaRecette.dao.Recette;
 
-public class ActiviteListeCourses extends Activity implements OnClickListener {
+public class ActivityShoplist extends Activity implements OnClickListener {
 
 	private ImageButton boutonBack;
 	private ListView listRecettes;
@@ -50,7 +50,7 @@ public class ActiviteListeCourses extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activite_liste_courses);
+		setContentView(R.layout.activity_shoplist);
 
 		boutonBack = (ImageButton) findViewById(R.id.boutonBack);
 		boutonBack.setOnClickListener(new OnClickListener() {
@@ -77,7 +77,7 @@ public class ActiviteListeCourses extends Activity implements OnClickListener {
 			public void onItemClick(final AdapterView<?> arg0, View arg1,
 					final int arg2, final long arg3) {
 				AlertDialog alertDialog = new AlertDialog.Builder(
-						ActiviteListeCourses.this).create();
+						ActivityShoplist.this).create();
 				alertDialog.setMessage("Retirer de la liste ?");
 				alertDialog.setButton("Non",
 						new DialogInterface.OnClickListener() {
@@ -102,7 +102,7 @@ public class ActiviteListeCourses extends Activity implements OnClickListener {
 							public void onClick(DialogInterface dialog, int id) {
 								// User clicked OK button
 								Intent intent1 = new Intent(
-										ActiviteListeCourses.this,
+										ActivityShoplist.this,
 										ActivityDetailRecipe.class);
 								intent1.putExtra("ID", listeRecettes.get(arg2)
 										.getId().intValue());

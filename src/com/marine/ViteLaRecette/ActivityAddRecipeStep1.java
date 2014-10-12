@@ -96,7 +96,7 @@ public class ActivityAddRecipeStep1 extends Activity {
         listDifficulty.add("Facile");
         listDifficulty.add("Moyen");
         listDifficulty.add("Difficile");
-        listDifficulty.add("Très difficle");
+        listDifficulty.add("Très difficile");
 
         ArrayAdapter<String> dataAdapterDifficulty = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listDifficulty);
         dataAdapterDifficulty.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -109,7 +109,7 @@ public class ActivityAddRecipeStep1 extends Activity {
 
         listPrice.add("Bon marché");
         listPrice.add("Moyen");
-        listPrice.add("Tres cher");
+        listPrice.add("Très cher");
 
         ArrayAdapter<String> dataAdapterPrice = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listPrice);
         dataAdapterPrice.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

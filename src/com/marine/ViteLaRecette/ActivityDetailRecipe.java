@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.*;
 import com.marine.ViteLaRecette.dao.Liste;
 import com.marine.ViteLaRecette.dao.Quantite;
@@ -32,9 +33,8 @@ public class ActivityDetailRecipe extends Activity {
     private SharedPreferences prefs;
     private int recetteID = 0;
 
-    private ArrayList<String> listDescription;
     private ListView listViewIngredients;
-    private ListView listViewDescriptionItems;
+    private ArrayAdapter<String> adapterListviewIngredients;
 
 
     @Override
@@ -62,22 +62,22 @@ public class ActivityDetailRecipe extends Activity {
         TextView recipePrice = (TextView) findViewById(R.id.textViewPriceID);
 
         listViewIngredients = (ListView) findViewById(R.id.listViewIngredientsID);
-        listViewDescriptionItems = (ListView) findViewById(R.id.listViewDescriptionItemsID);
 
         recipeName.setText(recipe.getNom());
         recipeCookingTime.setText("Temps de cuisson : " + recipe.getCuisson() + " min");
         recipePreparationTime.setText("Temps de preparation : " + recipe.getPreparation());
-        recipeLevel.setText("Difficulte : " + recipe.getDifficulte());
-        recipePrice.setText("Cout : " + recipe.getPrix());
+        recipeLevel.setText("Difficulte : " + translateToString(recipe.getDifficulte(), "difficulty"));
+        recipePrice.setText("Cout : " + translateToString(recipe.getPrix(), "price"));
 
 
         //Initialization List of ingredients
 
-        final ListView listViewIngredients = (ListView) findViewById(R.id.listViewIngredientsID);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.item_petit, quantities);
-        listViewIngredients.setAdapter(adapter);
-
+        listViewIngredients = (ListView) findViewById(R.id.listViewIngredientsID);
+        adapterListviewIngredients = new ArrayAdapter<String>(this, R.layout.item_petit, quantities);
+        listViewIngredients.setAdapter(adapterListviewIngredients);
         initQuantity(listOfIngredients, quantities);
+        resizeListviewIngredients();
+
 
         listViewIngredients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -149,7 +149,7 @@ public class ActivityDetailRecipe extends Activity {
                             S = "";
                         }
                         quantities.add((String) (Q + " " + listOfIngredients.get(i).getMesure().getNom() + listOfIngredients.get(i).getIngredient().getNom() + " " + S));
-                        listViewIngredients.setAdapter(adapter);
+                        listViewIngredients.setAdapter(adapterListviewIngredients);
                     }
 
                 }
@@ -188,8 +188,9 @@ public class ActivityDetailRecipe extends Activity {
                             S = "";
                         }
                         quantities.add((String) (Q + " " + listOfIngredients.get(i).getMesure().getNom() + listOfIngredients.get(i).getIngredient().getNom() + " " + S));
-                        listViewIngredients.setAdapter(adapter);
-                    }
+                        listViewIngredients.setAdapter(adapterListviewIngredients);
+
+                         }
                     Liste liste = new Liste(null, numberInt, recipe.getId());
                     MainActivity.listeDao.insert(liste);
 
@@ -285,7 +286,6 @@ public class ActivityDetailRecipe extends Activity {
         alertDialog.show();
     }
 
-
     private void changeStateButtonFavorites() {
         switch (recipe.getFavoris()) {
             case -1:
@@ -298,6 +298,40 @@ public class ActivityDetailRecipe extends Activity {
                 buttonFavorites.setBackgroundColor(getResources().getColor(R.color.yellow));
                 break;
         }
+    }
+
+    private String translateToString(int rating, String type){
+
+        String label = "";
+
+        if(rating==1 && type.equals("difficulty")){label = "Facile";}
+        if(rating==2 && type.equals("difficulty")){label = "Moyen";}
+        if(rating==3 && type.equals("difficulty")){label = "Difficile";}
+        if(rating==4 && type.equals("difficulty")){label = "Très difficile";}
+
+        if(rating==1 && type.equals("price")){label = "Bon marché";}
+        if(rating==2 && type.equals("price")){label = "Moyen";}
+        if(rating==3 && type.equals("price")){label = "Très cher";}
+
+        return label;
+    }
+
+    private void resizeListviewIngredients(){
+
+        int totalHeight = listViewIngredients.getPaddingTop() + listViewIngredients.getPaddingBottom();
+        for (int i = 0; i < adapterListviewIngredients.getCount(); i++) {
+            View listItem = adapterListviewIngredients.getView(i, null, listViewIngredients);
+            if (listItem instanceof ViewGroup) {
+                listItem.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            }
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listViewIngredients.getLayoutParams();
+        params.height = totalHeight + (listViewIngredients.getDividerHeight() * (adapterListviewIngredients.getCount() - 1));
+        listViewIngredients.setLayoutParams(params);
+
     }
 
 }

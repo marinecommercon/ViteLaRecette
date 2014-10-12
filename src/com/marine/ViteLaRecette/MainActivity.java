@@ -39,7 +39,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private Button buttonPersonalSearch;
     private Button buttonAllRecipes;
-    private Button buttonTest;
+    private Button buttonPreferences;
+    private Button buttonShoplist;
+    private Button buttonAddRecipe;
 	private Intent intent;
 
 	@Override
@@ -54,9 +56,14 @@ public class MainActivity extends Activity implements OnClickListener {
         buttonAllRecipes = (Button) findViewById(R.id.buttonAllRecipesID);
         buttonAllRecipes.setOnClickListener(this);
 
-        buttonTest = (Button) findViewById(R.id.buttonTestID);
-        buttonTest.setOnClickListener(this);
+        buttonPreferences = (Button) findViewById(R.id.buttonPreferencesID);
+        buttonPreferences.setOnClickListener(this);
 
+        buttonShoplist = (Button) findViewById(R.id.buttonShoplistID);
+        buttonShoplist.setOnClickListener(this);
+
+        buttonAddRecipe = (Button) findViewById(R.id.buttonAddRecipeID);
+        buttonAddRecipe.setOnClickListener(this);
 
 		importBdd();
 
@@ -90,20 +97,27 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 
             case R.id.buttonPersonalSearchID:
-                intent = new Intent(MainActivity.this,
-                        ActivityPersonalSearch.class);
+                intent = new Intent(MainActivity.this, ActivityPersonalSearch.class);
                 startActivity(intent);
                 break;
 
             case R.id.buttonAllRecipesID:
-                intent = new Intent(MainActivity.this,
-                        ActivityAllRecipes.class);
+                intent = new Intent(MainActivity.this, ActivityAllRecipes.class);
                 startActivity(intent);
                 break;
 
-            case R.id.buttonTestID:
-                intent = new Intent(MainActivity.this,
-                        ActivityAddRecipeStep1.class);
+            case R.id.buttonPreferencesID:
+                intent = new Intent(MainActivity.this, ActivityPreferences.class);
+                startActivity(intent);
+                break;
+
+            case R.id.buttonShoplistID:
+                intent = new Intent(MainActivity.this, ActivityShoplist.class);
+                startActivity(intent);
+                break;
+
+            case R.id.buttonAddRecipeID:
+                intent = new Intent(MainActivity.this, ActivityAddRecipeStep1.class);
                 startActivity(intent);
                 break;
 

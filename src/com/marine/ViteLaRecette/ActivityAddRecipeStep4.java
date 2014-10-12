@@ -5,9 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import com.marine.ViteLaRecette.dao.Mesure;
+import android.view.ViewGroup;
+import android.widget.*;
 import com.marine.ViteLaRecette.dao.Quantite;
+import com.marine.ViteLaRecette.dao.Recette;
 
 import java.util.ArrayList;
 
@@ -27,15 +28,32 @@ public class ActivityAddRecipeStep4 extends Activity {
     private int timePrepa;
     private int timeCooking;
     private String difficulty;
+    private int difficultyInt;
     private String price;
+    private int priceInt;
 
     private ArrayList<String> dbListQuantities;
     private ArrayList<String> dbListUnits;
     private ArrayList<String> dbListIngredients;
     private Quantite fullIngredient;
-    private ArrayList<Quantite> ListFullIngredients;
+    private ArrayList<Quantite> listFullIngredients;
+    private ArrayList<String> listFullIngredientsString;
+    private String tempUnit;
+    private String tempIngredient;
 
     private String steps;
+
+    private TextView textViewName;
+    private TextView textViewType;
+    private TextView textViewNumber;
+    private TextView textViewCookingTime;
+    private TextView textViewPreparationTime;
+    private TextView textViewDifficulty;
+    private TextView textViewPrice;
+    private ListView listViewIngredients;
+    private ArrayAdapter<String> adapterListviewIngredients;
+    private TextView textViewDescription;
+
 
 
 
@@ -50,7 +68,6 @@ public class ActivityAddRecipeStep4 extends Activity {
         dbListUnits = intent.getStringArrayListExtra("DB_UNITS");
         dbListIngredients = intent.getStringArrayListExtra("DB_INGREDIENTS");
 
-
         initUI(this);
 
     }
@@ -64,8 +81,7 @@ public class ActivityAddRecipeStep4 extends Activity {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ActivityAddRecipeStep4.this,
-                        MainActivity.class);
+                Intent intent = new Intent(ActivityAddRecipeStep4.this,MainActivity.class);
                 startActivity(intent);
             }
         });
@@ -76,13 +92,43 @@ public class ActivityAddRecipeStep4 extends Activity {
             @Override
             public void onClick(View v) {
 
+                addRecipe();
+                Toast.makeText(getApplicationContext(), "Recette ajoutée", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ActivityAddRecipeStep4.this,MainActivity.class);
+                startActivity(intent);
+
             }
         });
 
+        //add elements to the UI
+        textViewName = (TextView) findViewById(R.id.textViewNameID);
+        textViewType = (TextView) findViewById(R.id.textViewTypeID);
+        textViewNumber = (TextView) findViewById(R.id.textViewNumberID);
+        textViewPreparationTime = (TextView) findViewById(R.id.textViewPreparationTimeID);
+        textViewCookingTime = (TextView) findViewById(R.id.textViewCookingTimeID);
+        textViewDifficulty = (TextView) findViewById(R.id.textViewDifficultyID);
+        textViewPrice = (TextView) findViewById(R.id.textViewPriceID);
+        textViewDescription = (TextView) findViewById(R.id.textViewDescriptionID);
+
+
         initValues();
         getPrefs();
-        addFullIngredient(0);
+        for (int i=0 ; i<dbListIngredients.size() ; i++){addFullIngredient(i);}
 
+
+        textViewName.setText(name);
+        textViewType.setText(type);
+        textViewNumber.setText(""+number);
+        textViewPreparationTime.setText(""+timePrepa);
+        textViewCookingTime.setText(""+timeCooking);
+        textViewDifficulty.setText(difficulty);
+        textViewPrice.setText(price);
+        textViewDescription.setText(steps);
+
+        listViewIngredients = (ListView) findViewById(R.id.listViewIngredientsID);
+        adapterListviewIngredients = new ArrayAdapter<String>(this, R.layout.item_petit, listFullIngredientsString);
+        listViewIngredients.setAdapter(adapterListviewIngredients);
+        resizeListviewIngredients();
 
 
     }
@@ -99,7 +145,8 @@ public class ActivityAddRecipeStep4 extends Activity {
         difficulty = "";
         price = "";
 
-        ListFullIngredients = new ArrayList<Quantite>();
+        listFullIngredients = new ArrayList<Quantite>();
+        listFullIngredientsString = new ArrayList<String>();
 
         steps = "";
     }
@@ -108,7 +155,7 @@ public class ActivityAddRecipeStep4 extends Activity {
         preferences =  getApplicationContext().getSharedPreferences("ADD_RECIPE", 0);
         name = preferences.getString("ADD_RECIPE_NAME", "");
         type = preferences.getString("ADD_RECIPE_TYPE", "");
-        number = preferences.getInt("ADD_RECIPE_NUMBERE", 0);
+        number = preferences.getInt("ADD_RECIPE_NUMBER", 0);
         timePrepa = preferences.getInt("ADD_RECIPE_TIMEPREPA", 0);
         timeCooking = preferences.getInt("ADD_RECIPE_TIMECOOKING", 0);
         difficulty = preferences.getString("ADD_RECIPE_DIFFICULTY", "");
@@ -120,14 +167,71 @@ public class ActivityAddRecipeStep4 extends Activity {
 
         fullIngredient = new Quantite();
 
-        dbListQuantities.get(i);
-        dbListIngredients.get(i);
-
-        fullIngredient.setQuantite((float) Integer.parseInt(dbListUnits.get(i)));
-        fullIngredient.setMesureId((long) Integer.parseInt(dbListQuantities.get(i)));
+        fullIngredient.setQuantite((float) Integer.parseInt(dbListQuantities.get(i)));
+        fullIngredient.setMesureId((long) Integer.parseInt(dbListUnits.get(i)));
         fullIngredient.setIngredientId((long) Integer.parseInt(dbListIngredients.get(i)));
 
-        ListFullIngredients.add(fullIngredient);
+        listFullIngredients.add(fullIngredient);
+
+        //for the UI
+        tempUnit = MainActivity.mesureDao.queryBuilder().where(com.marine.ViteLaRecette.dao.IngredientDao.Properties.Id.eq(dbListUnits.get(i))).unique().getNom();
+        tempIngredient = MainActivity.ingredientDao.queryBuilder().where(com.marine.ViteLaRecette.dao.IngredientDao.Properties.Id.eq(dbListIngredients.get(i))).unique().getNom();
+
+        listFullIngredientsString.add(dbListQuantities.get(i).toString() + " " + tempUnit.toString() + " " + tempIngredient.toString());
+
+    }
+
+    private void addRecipe(){
+
+        long iD = 0;
+        Recette recette = new Recette(null, name.toString(),
+                type.toString(), (int) timeCooking,(int) timePrepa,
+                steps.toString(), (int) translateToInt(price),
+                (int) translateToInt(difficulty), (int) 0,
+                (int) number, (int) 0);
+
+        iD = MainActivity.recetteDao.insert(new Recette(null, name.toString(),
+                type.toString(), (int) timeCooking,(int) timePrepa,
+                steps.toString(), (int) translateToInt(price),
+                (int) translateToInt(difficulty), (int) 0,
+                (int) number, (int) 0));
+
+        for (int i = 0; i < listFullIngredients.size(); i++) {
+            listFullIngredients.get(i).setRecetteId(iD);
+            MainActivity.daoSession.insert(listFullIngredients.get(i));
+        }
+    }
+
+    private int translateToInt(String name){
+
+        int rating = 0;
+
+        if(name.equals("Facile")){rating = 1;}
+        if(name.equals("Moyen")){rating = 2;}
+        if(name.equals("Difficile")){rating = 3;}
+        if(name.equals("Très difficile")){rating = 4;}
+        if(name.equals("Bon marché")){rating = 1;}
+        if(name.equals("Moyen")){rating = 2;}
+        if(name.equals("Très cher")){rating = 3;}
+
+        return rating;
+    }
+
+    private void resizeListviewIngredients(){
+
+        int totalHeight = listViewIngredients.getPaddingTop() + listViewIngredients.getPaddingBottom();
+        for (int i = 0; i < adapterListviewIngredients.getCount(); i++) {
+            View listItem = adapterListviewIngredients.getView(i, null, listViewIngredients);
+            if (listItem instanceof ViewGroup) {
+                listItem.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            }
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listViewIngredients.getLayoutParams();
+        params.height = totalHeight + (listViewIngredients.getDividerHeight() * (adapterListviewIngredients.getCount() - 1));
+        listViewIngredients.setLayoutParams(params);
 
     }
 

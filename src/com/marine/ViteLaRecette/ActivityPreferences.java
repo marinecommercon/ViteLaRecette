@@ -10,12 +10,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.Spinner;
 
 import com.marine.ViteLaRecette.adapter.AdapterPersonalSearch;
 import com.marine.ViteLaRecette.dao.Categorie;
@@ -23,10 +19,9 @@ import com.marine.ViteLaRecette.dao.Ingredient;
 import com.marine.ViteLaRecette.dao.Recette;
 import com.marine.ViteLaRecette.dao.RecetteDao.Properties;
 
-public class ActivitePreferences extends Activity {
+public class ActivityPreferences extends Activity {
 
-	private ImageButton boutonBack;
-	private ImageButton boutonAjoutCategorieBannie;
+	private Button boutonAjoutCategorieBannie;
 	private ListView listViewRecettes;
 	private List<Recette> listeRecettes;
 	private AdapterPersonalSearch adapter;
@@ -50,9 +45,7 @@ public class ActivitePreferences extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activite_preferences);
-
-		initBoutonBack();
+		setContentView(R.layout.activity_preferences);
 
 		initSpinnerCategorie();
 		
@@ -67,36 +60,19 @@ public class ActivitePreferences extends Activity {
 		initListeCategorie();
 
 	}
-	
-	/*
-	 * Initialisation du bouton retour
-	 * et de son listener
-	 */
-	private void initBoutonBack(){
-		boutonBack = (ImageButton) findViewById(R.id.boutonBack);
-		boutonBack.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});
-	}
-	
-	/*
-	 * Cette m�thode ajoute le bouton ajouter cat�gorie.
-	 * Ce bouton permet d'ajouter une cat�gorie aux ind�sirables via un alertDialog.
-	 */
+
+
 	private void initBoutonAjouterCategorie(){
 		
-		boutonAjoutCategorieBannie = (ImageButton) findViewById(R.id.boutonAjoutCategorieBannie);
+		boutonAjoutCategorieBannie = (Button) findViewById(R.id.boutonAjoutCategorieBannie);
 		boutonAjoutCategorieBannie.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 
 				AlertDialog alertDialog = new AlertDialog.Builder(
-						ActivitePreferences.this).create();
-				alertDialog.setMessage("Bannir cat�gorie : ");
+						ActivityPreferences.this).create();
+				alertDialog.setMessage("Bannir catégorie : ");
 
 				alertDialog.setView(spinnerCat);
 				alertDialog.setButton("Retour",
@@ -123,13 +99,10 @@ public class ActivitePreferences extends Activity {
 		});
 		
 	}
-	
-	/*
-	 * Initialise les spinner cat�gorie en vue de l'ajout d'une cat�gorie.
-	 */
+
 	private void initSpinnerCategorie(){
 		
-		spinnerCat = new Spinner(ActivitePreferences.this);
+		spinnerCat = new Spinner(ActivityPreferences.this);
 
 		listCat = new ArrayList<String>();
 		listeCat = MainActivity.categorieDao
@@ -139,18 +112,14 @@ public class ActivitePreferences extends Activity {
 		}
 
 		spinnerCatAdapter = new ArrayAdapter<String>(
-				ActivitePreferences.this,
+				ActivityPreferences.this,
 				android.R.layout.simple_spinner_item, listCat);
 		spinnerCatAdapter
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerCat.setAdapter(spinnerCatAdapter);
 		
 	}
-	
-	/*
-	 * Initialise la liste des recettes favorites et d�finit l'alertDialog a afficher en cas
-	 * de selection.
-	 */
+
 	private void initListeRecettesFavoris(){
 		listViewRecettes = (ListView) findViewById(R.id.recettesList);
 		listViewRecettes.setOnItemClickListener(new OnItemClickListener() {
@@ -158,34 +127,34 @@ public class ActivitePreferences extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					final int arg2, long arg3) {
 				alert = new AlertDialog.Builder(
-						ActivitePreferences.this).create();
+						ActivityPreferences.this).create();
 				alert.setMessage("Retirer de la liste ?");
 				alert.setButton("Non",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-							}
-						});
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        });
 				alert.setButton2("Oui",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								listeRecettes.get(arg2).setFavoris(0);
-								MainActivity.recetteDao.update(listeRecettes
-										.get(arg2));
-								listeRecettes.remove(arg2);
-								adapter.notifyDataSetChanged();
-							}
-						});
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                listeRecettes.get(arg2).setFavoris(0);
+                                MainActivity.recetteDao.update(listeRecettes
+                                        .get(arg2));
+                                listeRecettes.remove(arg2);
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
 				alert.setButton3("Detail",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								Intent intent1 = new Intent(
-										ActivitePreferences.this,
-										ActivityDetailRecipe.class);
-								intent1.putExtra("ID", listeRecettes.get(arg2)
-										.getId());
-								startActivity(intent1);
-							}
-						});
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent1 = new Intent(
+                                        ActivityPreferences.this,
+                                        ActivityDetailRecipe.class);
+                                intent1.putExtra("ID", listeRecettes.get(arg2)
+                                        .getId());
+                                startActivity(intent1);
+                            }
+                        });
 
 				alert.show();
 			}
@@ -209,7 +178,7 @@ public class ActivitePreferences extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					final int arg2, long arg3) {
 				AlertDialog alertDialog = new AlertDialog.Builder(
-						ActivitePreferences.this).create();
+						ActivityPreferences.this).create();
 				alertDialog.setMessage("Retirer de la liste ?");
 				alertDialog.setButton("Non",
 						new DialogInterface.OnClickListener() {
@@ -238,9 +207,7 @@ public class ActivitePreferences extends Activity {
 		
 	}
 	
-	/*
-	 * Initialise, remplit et g�re la suppression des �l�ments de la liste : Ingr�dients bannis.
-	 */
+
 	private void initListeIngredients(){
 		
 		listViewIngredients = (ListView) findViewById(R.id.ingredientsList);
@@ -249,7 +216,7 @@ public class ActivitePreferences extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					final int arg2, long arg3) {
 				AlertDialog alertDialog = new AlertDialog.Builder(
-						ActivitePreferences.this).create();
+						ActivityPreferences.this).create();
 				alertDialog.setMessage("Retirer de la liste ?");
 				alertDialog.setButton("Non",
 						new DialogInterface.OnClickListener() {
@@ -288,9 +255,7 @@ public class ActivitePreferences extends Activity {
 		
 	}
 	
-	/*
-	 * Initialise, remplit et g�re la suppression des �l�ments de la liste : Cat�gories bannies.
-	 */
+
 	private void initListeCategorie(){
 		listViewCategories = (ListView) findViewById(R.id.categoriesList);
 		listViewCategories.setOnItemClickListener(new OnItemClickListener() {
@@ -298,7 +263,7 @@ public class ActivitePreferences extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					final int arg2, long arg3) {
 				AlertDialog alertDialog = new AlertDialog.Builder(
-						ActivitePreferences.this).create();
+						ActivityPreferences.this).create();
 				alertDialog.setMessage("Retirer de la liste ?");
 				alertDialog.setButton("Non",
 						new DialogInterface.OnClickListener() {

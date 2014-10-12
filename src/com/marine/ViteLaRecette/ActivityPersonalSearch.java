@@ -48,13 +48,13 @@ public class ActivityPersonalSearch extends Activity {
 		spinnerTypeOfDish = (Spinner) findViewById(R.id.spinnerChangeOrder);
 		List<String> list = new ArrayList<String>();
 
-        list.add("Plat principal");
         list.add("Peu importe");
-        list.add("Entree");
+        list.add("Plat principal");
+        list.add("Entrée");
 		list.add("Dessert");
 		list.add("Sauce");
 		list.add("Accompagnement");
-		list.add("Aperitif");
+		list.add("Amuse-gueule");
 		list.add("Boisson");
 
 		ArrayAdapter<String> spinnerTypeOfDishAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, list);

@@ -248,7 +248,7 @@ public class ActivitySeeResults extends ListActivity {
 
         String MY_QUERY;
 
-        if (typeOfDish.equals(" Peu importe ")) {
+        if (typeOfDish.equals("Peu importe")) {
 
         MY_QUERY = "SELECT RECETTE._id " + "FROM RECETTE "
                     + "INNER JOIN QUANTITE "
