@@ -48,7 +48,11 @@ public class ActivityAddRecipeStep2 extends Activity {
     private Mesure requestUnit;
 
     private Quantite dbIngredient;
-    private ArrayList<Quantite> dbListIngredients;
+
+    private ArrayList<String> dbListQuantities;
+    private ArrayList<String> dbListUnits;
+    private ArrayList<String> dbListIngredients;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +71,11 @@ public class ActivityAddRecipeStep2 extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ActivityAddRecipeStep2.this,ActivityAddRecipeStep3.class);
-                intent.putExtra("DB_INGREDIENTS",dbListIngredients);
+
+                intent.putStringArrayListExtra("DB_QUANTITIES",dbListQuantities);
+                intent.putStringArrayListExtra("DB_UNITS",dbListUnits);
+                intent.putStringArrayListExtra("DB_INGREDIENTS",dbListIngredients);
+
                 startActivity(intent);
             }
         });
@@ -101,8 +109,12 @@ public class ActivityAddRecipeStep2 extends Activity {
         adapterListviewIngredients = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listFullIngredients);
         listviewIngredients.setAdapter(adapterListviewIngredients);
 
+
         //for the database
-        dbListIngredients = new ArrayList<Quantite>();
+        dbListQuantities = new ArrayList<String>();
+        dbListUnits = new ArrayList<String>();
+        dbListIngredients = new ArrayList<String>();
+
 
         initUnits();
         initIngredients();
@@ -210,18 +222,22 @@ public class ActivityAddRecipeStep2 extends Activity {
         dbIngredient = new Quantite();
 
 
+
         //handle quantity
         if(edittextQuantity.getText().length()==0){
-            dbIngredient.setQuantite((float) 0);
+            dbListQuantities.add("0");
         }
         else{
-            dbIngredient.setQuantite((float) Integer.parseInt(edittextQuantity.getText().toString()));
+            //dbIngredient.setQuantite((float) Integer.parseInt(edittextQuantity.getText().toString()));
+            dbListQuantities.add(edittextQuantity.getText().toString());
         }
+
 
         //handle unit
         if (autoUnit.length() == 0) {
             listFullIngredients.add(edittextQuantity.getText().toString() + " " + autoIngredient.getText().toString());
-            dbIngredient.setMesureId((long) 0);
+            //dbIngredient.setMesureId((long) 0);
+            dbListUnits.add("0");
         }
 
         else{
@@ -234,20 +250,22 @@ public class ActivityAddRecipeStep2 extends Activity {
                 newUnit = new Mesure(null, autoUnit.getText().toString());
                 MainActivity.mesureDao.insert(newUnit);
                 initUnits();
-                dbIngredient.setMesureId(newUnit.getId());
+                //dbIngredient.setMesureId(newUnit.getId());
+                dbListUnits.add(""+newUnit.getId());
             }
 
             else{
-                dbIngredient.setMesureId(requestUnit.getId());
+                //dbIngredient.setMesureId(requestUnit.getId());
+                dbListUnits.add(""+requestUnit.getId());
             }
 
             listFullIngredients.add(edittextQuantity.getText().toString() + " " + autoUnit.getText().toString() + " " + autoIngredient.getText().toString());
         }
 
         //handle ingredient
-        dbIngredient.setIngredientId(MainActivity.ingredientDao.queryBuilder().where(com.marine.ViteLaRecette.dao.IngredientDao.Properties.Nom.eq(autoIngredient.getText())).unique().getId());
+        long iD = MainActivity.ingredientDao.queryBuilder().where(com.marine.ViteLaRecette.dao.IngredientDao.Properties.Nom.eq(autoIngredient.getText())).unique().getId();
+        dbListIngredients.add(""+ iD);
 
-        dbListIngredients.add(dbIngredient);
 
         //update the adapter
         adapterListviewIngredients.notifyDataSetChanged();

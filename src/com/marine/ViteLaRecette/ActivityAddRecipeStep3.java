@@ -2,14 +2,19 @@ package com.marine.ViteLaRecette;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.View;
+import android.widget.AbsoluteLayout;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import com.marine.ViteLaRecette.dao.Quantite;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by mcommercon on 09/10/14.
@@ -17,13 +22,25 @@ import java.util.ArrayList;
 public class ActivityAddRecipeStep3 extends Activity {
 
     private Button buttonNext;
-    private ArrayList<Quantite> dbListIngredients;
+    private EditText edittextSteps;
+    private String steps;
+
+    private SharedPreferences preferences;
+
+    private ArrayList<String> dbListQuantities;
+    private ArrayList<String> dbListUnits;
+    private ArrayList<String> dbListIngredients;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_recipe_step3);
 
+        Intent intent = getIntent();
+
+        dbListQuantities = intent.getStringArrayListExtra("DB_QUANTITIES");
+        dbListUnits = intent.getStringArrayListExtra("DB_UNITS");
+        dbListIngredients = intent.getStringArrayListExtra("DB_INGREDIENTS");
 
         initUI(this);
 
@@ -32,20 +49,46 @@ public class ActivityAddRecipeStep3 extends Activity {
 
     protected void initUI(Activity a) {
 
+        edittextSteps = (EditText) findViewById(R.id.edittextSteps);
+
         //Init button
         buttonNext = (Button) findViewById(R.id.buttonNext);
         buttonNext.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ActivityAddRecipeStep3.this,
-                        ActivityAddRecipeStep4.class);
+                Intent intent = new Intent(ActivityAddRecipeStep3.this,ActivityAddRecipeStep4.class);
+
+                intent.putStringArrayListExtra("DB_QUANTITIES",dbListQuantities);
+                intent.putStringArrayListExtra("DB_UNITS",dbListUnits);
+                intent.putStringArrayListExtra("DB_INGREDIENTS",dbListIngredients);
+
+                resetPrefs();
+                steps = edittextSteps.getText().toString();
+                addPreferences();
+
                 startActivity(intent);
             }
         });
 
+    }
+
+    private void addPreferences(){
+
+        preferences =  getApplicationContext().getSharedPreferences("ADD_RECIPE", 0);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("ADD_RECIPE_STEPS", steps);
+        editor.commit();
+    }
+
+    private void resetPrefs(){
+        preferences =  getApplicationContext().getSharedPreferences("ADD_RECIPE", 0);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("ADD_RECIPE_STEPS", "");
+        editor.commit();
 
     }
+
 
 
 }

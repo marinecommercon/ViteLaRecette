@@ -29,7 +29,7 @@ public class ActivityAddRecipeStep1 extends Activity {
     private Spinner spinnerType;
     private Spinner spinnerDifficulty;
     private Spinner spinnerPrice;
-    Button buttonNext;
+    private Button buttonNext;
 
     private SharedPreferences preferences;
 
@@ -87,7 +87,7 @@ public class ActivityAddRecipeStep1 extends Activity {
 
         //Time of cooking
         editTextTimeCooking = (EditText) findViewById(R.id.edittextTimeCooking);
-        editTextTimePrepa.setInputType(InputType.TYPE_CLASS_NUMBER);
+        editTextTimeCooking.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         //Spinner difficulty
         spinnerDifficulty = (Spinner) findViewById(R.id.spinnerDifficulty);
