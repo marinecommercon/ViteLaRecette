@@ -85,10 +85,6 @@ public class ActivityDetailRecipeSteps extends Activity{
 
         }
 
-        for(int i=0 ; i<listDescription.size() ; i++){
-            System.out.println(listDescription.get(i));
-
-        }
     }
 
     private void initCheckboxes(Activity a) {

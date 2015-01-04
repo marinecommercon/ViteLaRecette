@@ -27,20 +27,11 @@ public class ActivityAddRecipeStep3 extends Activity {
 
     private SharedPreferences preferences;
 
-    private ArrayList<String> dbListQuantities;
-    private ArrayList<String> dbListUnits;
-    private ArrayList<String> dbListIngredients;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_recipe_step3);
-
-        Intent intent = getIntent();
-
-        dbListQuantities = intent.getStringArrayListExtra("DB_QUANTITIES");
-        dbListUnits = intent.getStringArrayListExtra("DB_UNITS");
-        dbListIngredients = intent.getStringArrayListExtra("DB_INGREDIENTS");
 
         initUI(this);
 
@@ -58,10 +49,6 @@ public class ActivityAddRecipeStep3 extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ActivityAddRecipeStep3.this,ActivityAddRecipeStep4.class);
-
-                intent.putStringArrayListExtra("DB_QUANTITIES",dbListQuantities);
-                intent.putStringArrayListExtra("DB_UNITS",dbListUnits);
-                intent.putStringArrayListExtra("DB_INGREDIENTS",dbListIngredients);
 
                 resetPrefs();
                 steps = edittextSteps.getText().toString();

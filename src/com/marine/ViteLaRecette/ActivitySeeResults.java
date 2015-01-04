@@ -7,12 +7,10 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Spinner;
 import com.marine.ViteLaRecette.adapter.AdapterPersonalSearch;
 import com.marine.ViteLaRecette.dao.Quantite;
 import com.marine.ViteLaRecette.dao.QuantiteDao.Properties;
@@ -47,9 +45,17 @@ public class ActivitySeeResults extends ListActivity {
 
 		findRecettes();
 		initListRecipes();
-		initScore();
-		initAdapter();
-		fulfilSpinnerChangeOrder();
+
+        if(listRecipes.size()==0) {
+            Toast.makeText(getApplicationContext(), "Aucune recette n'a été trouvée", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        else {
+            initScore();
+            initAdapter();
+            fulfilSpinnerChangeOrder();
+        }
 	}
 
 
@@ -250,6 +256,7 @@ public class ActivitySeeResults extends ListActivity {
 
         if (typeOfDish.equals("Peu importe")) {
 
+        //Query = Get the quantities to compare them with the ingredients
         MY_QUERY = "SELECT RECETTE._id " + "FROM RECETTE "
                     + "INNER JOIN QUANTITE "
                     + "ON RECETTE._id = QUANTITE.RECETTE_ID "
@@ -263,8 +270,8 @@ public class ActivitySeeResults extends ListActivity {
                 + "ON RECETTE._id = QUANTITE.RECETTE_ID "
                 + "INNER JOIN INGREDIENT "
                 + "ON QUANTITE.INGREDIENT_ID = INGREDIENT._id "
-                + "WHERE RECETTE.TYPE = '" + typeOfDish + "' " +
-                "AND RECETTE.FAVORIS <> -1 ";
+                + "WHERE RECETTE.TYPE = '" + typeOfDish + "' "
+                + "AND RECETTE.FAVORIS <> -1 ";
         }
 
         if ((ingredientAId >= 0) || (ingredientBId >= 0) || (ingredientCId >= 0)) {
@@ -281,7 +288,9 @@ public class ActivitySeeResults extends ListActivity {
                 + "INNER JOIN CATEGORIE "
                 + "ON INGREDIENT.CATEGORIE_ID = CATEGORIE._id "
                 + "WHERE CATEGORIE.FAVORIS = -1 "
-                + "AND INGREDIENT.FAVORIS = -1 ) " + "GROUP BY RECETTE._id ";
+                + "OR INGREDIENT.FAVORIS = -1 ) "
+                + "GROUP BY RECETTE._id "
+                + "ORDER BY RECETTE.NOM ASC";
 
         cursor = MainActivity.db.rawQuery(MY_QUERY, null);
 		

@@ -5,116 +5,118 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
 import com.marine.ViteLaRecette.dao.Ingredient;
+import com.marine.ViteLaRecette.dao.Recette;
 
 public class ActivityPersonalSearch extends Activity {
 
 
-	private Button buttonSearch;
-    
-	private Spinner spinnerTypeOfDish;
-    
-	private AutoCompleteTextView autoCompIngredientA;
-	private AutoCompleteTextView autoCompIngredientB;
-	private AutoCompleteTextView autoCompIngredientC;
-    
-    
-	private ArrayAdapter<String> adapterIngredients;
-	private List<Ingredient> listIngredients;
-	private ArrayList<String> listIngredientsNames;
-	private Intent intent;
+    private Button buttonSearch;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setTheme(android.R.style.Theme);
-		setContentView(R.layout.activity_personal_search);
+    private Spinner spinnerTypeOfDish;
 
-		
-		initBoutonRecherche();
-		initSpinnerType();
-		initIngredients();
+    private AutoCompleteTextView autoCompIngredientA;
+    private AutoCompleteTextView autoCompIngredientB;
+    private AutoCompleteTextView autoCompIngredientC;
 
-	}
 
-	
-	public void initSpinnerType() {
+    private ArrayAdapter<String> adapterIngredients;
+    private List<Ingredient> listIngredients;
+    private ArrayList<String> listIngredientsNames;
+    private Intent intent;
 
-		spinnerTypeOfDish = (Spinner) findViewById(R.id.spinnerChangeOrder);
-		List<String> list = new ArrayList<String>();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTheme(android.R.style.Theme);
+        setContentView(R.layout.activity_personal_search);
+
+
+        initBoutonRecherche();
+        initSpinnerType();
+        initIngredients();
+
+    }
+
+
+    public void initSpinnerType() {
+
+        spinnerTypeOfDish = (Spinner) findViewById(R.id.spinnerChangeOrder);
+        List<String> list = new ArrayList<String>();
 
         list.add("Peu importe");
         list.add("Plat principal");
         list.add("Entrée");
-		list.add("Dessert");
-		list.add("Sauce");
-		list.add("Accompagnement");
-		list.add("Amuse-gueule");
-		list.add("Boisson");
+        list.add("Dessert");
+        list.add("Sauce");
+        list.add("Accompagnement");
+        list.add("Amuse-gueule");
+        list.add("Boisson");
 
-		ArrayAdapter<String> spinnerTypeOfDishAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, list);
+        ArrayAdapter<String> spinnerTypeOfDishAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, list);
 
         spinnerTypeOfDishAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerTypeOfDish.setAdapter(spinnerTypeOfDishAdapter);
-	}
+        spinnerTypeOfDish.setAdapter(spinnerTypeOfDishAdapter);
+    }
 
-	
-	private long ingredientExiste(Editable c) {
 
-		Ingredient ingredient = MainActivity.ingredientDao
-				.queryBuilder()
-				.where(com.marine.ViteLaRecette.dao.IngredientDao.Properties.Nom
-						.eq(c)).unique();
+    private long ingredientExiste(Editable c) {
 
-		if (ingredient != null) {
+        Ingredient ingredient = MainActivity.ingredientDao
+                .queryBuilder()
+                .where(com.marine.ViteLaRecette.dao.IngredientDao.Properties.Nom
+                        .eq(c)).unique();
 
-			return ingredient.getId();
+        if (ingredient != null) {
 
-		} else {
-			return -1;
-		}
+            return ingredient.getId();
 
-	}
-	
-	
-	
-	private void initIngredients(){
-		
-		listIngredientsNames = new ArrayList<String>();
+        } else {
+            return -1;
+        }
 
-		listIngredients = MainActivity.ingredientDao.queryBuilder().list();
+    }
 
-		for (int i = 0; i < listIngredients.size(); i++) {
-			listIngredientsNames.add(listIngredients.get(i).getNom());
-		}
 
-		adapterIngredients = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, listIngredientsNames);
 
-		autoCompIngredientA = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewIngredientA);
-		autoCompIngredientA.setThreshold(2);
-		autoCompIngredientA.setAdapter(adapterIngredients);
+    private void initIngredients(){
 
-		autoCompIngredientB = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewIngredientB);
-		autoCompIngredientB.setThreshold(2);
-		autoCompIngredientB.setAdapter(adapterIngredients);
+        listIngredientsNames = new ArrayList<String>();
 
-		autoCompIngredientC = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewIngredientC);
-		autoCompIngredientC.setThreshold(2);
-		autoCompIngredientC.setAdapter(adapterIngredients);
-		
-	}
-	
-	
+        listIngredients = MainActivity.ingredientDao.queryBuilder().list();
 
-	
-	private void initBoutonRecherche(){
-		buttonSearch = (Button) findViewById(R.id.buttonSearchID);
-		buttonSearch.setOnClickListener(new OnClickListener() {
+        for (int i = 0; i < listIngredients.size(); i++) {
+            listIngredientsNames.add(listIngredients.get(i).getNom());
+        }
+
+        adapterIngredients = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, listIngredientsNames);
+
+        autoCompIngredientA = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewIngredientA);
+        autoCompIngredientA.setThreshold(2);
+        autoCompIngredientA.setAdapter(adapterIngredients);
+
+        autoCompIngredientB = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewIngredientB);
+        autoCompIngredientB.setThreshold(2);
+        autoCompIngredientB.setAdapter(adapterIngredients);
+
+        autoCompIngredientC = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewIngredientC);
+        autoCompIngredientC.setThreshold(2);
+        autoCompIngredientC.setAdapter(adapterIngredients);
+
+    }
+
+
+
+
+    private void initBoutonRecherche(){
+        buttonSearch = (Button) findViewById(R.id.buttonSearchID);
+        buttonSearch.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -142,6 +144,6 @@ public class ActivityPersonalSearch extends Activity {
             }
 
         });
-	}
+    }
 
 }

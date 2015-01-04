@@ -58,8 +58,6 @@ public class ActivityAddRecipeStep1 extends Activity {
         //Name of the recipe
         editTextName = (EditText) findViewById(R.id.edittextName);
 
-
-
         //Spinner Type
         spinnerType = (Spinner) findViewById(R.id.spinnerType);
         List<String> listType = new ArrayList<String>();
@@ -75,7 +73,6 @@ public class ActivityAddRecipeStep1 extends Activity {
         ArrayAdapter<String> dataAdapterType = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listType);
         dataAdapterType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerType.setAdapter(dataAdapterType);
-
 
         //Number
         editTextNumber = (EditText) findViewById(R.id.edittextNumber);
@@ -232,6 +229,7 @@ public class ActivityAddRecipeStep1 extends Activity {
         editor.putInt("ADD_RECIPE_TIMECOOKING", 0);
         editor.putString("ADD_RECIPE_DIFFICULTY", "");
         editor.putString("ADD_RECIPE_PRICE", "");
+        editor.putBoolean("RECIPE_COMPLETE",false);
         editor.commit();
 
     }

@@ -39,14 +39,6 @@
                   android:theme="@android:style/Theme.NoTitleBar">
         </activity>
 
-        <activity android:name="ActiviteListeCourses"
-                  android:theme="@android:style/Theme.NoTitleBar">
-        </activity>
-
-        <activity android:name="ActivitePreferences"
-                  android:theme="@android:style/Theme.NoTitleBar">
-        </activity>
-
         <activity android:name="ActivityDetailRecipeSteps"
                   android:theme="@android:style/Theme.NoTitleBar">
         </activity>
@@ -67,6 +59,13 @@
                   android:theme="@android:style/Theme.NoTitleBar">
         </activity>
 
+        <activity android:name=".ActivityShoplist"
+                  android:theme="@android:style/Theme.NoTitleBar">
+        </activity>
+
+        <activity android:name=".ActivityPreferences"
+                  android:theme="@android:style/Theme.NoTitleBar">
+        </activity>
 
 
 

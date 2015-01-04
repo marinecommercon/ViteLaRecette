@@ -63,9 +63,13 @@ public class ActivityAllRecipes extends ListActivity {
 		
 		textColumn = RecetteDao.Properties.Nom.columnName;
 		orderBy = textColumn + " COLLATE LOCALIZED ASC";
+
 		cursor = MainActivity.db.query(MainActivity.recetteDao.getTablename(),
 				MainActivity.recetteDao.getAllColumns(), null, null, null,
 				null, orderBy);
+
+
+
 			}
 	
 
@@ -74,8 +78,6 @@ public class ActivityAllRecipes extends ListActivity {
 		int[] to = { R.id.textViewRecipeNameID, R.id.textViewRecipeTypeID };
 		adapter = new SimpleCursorAdapter(this, R.layout.activity_all_recipes_list, cursor, from, to);
 		setListAdapter(adapter);
-
-
        }
 
 

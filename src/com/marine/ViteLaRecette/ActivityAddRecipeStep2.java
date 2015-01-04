@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -53,6 +54,8 @@ public class ActivityAddRecipeStep2 extends Activity {
     private ArrayList<String> dbListUnits;
     private ArrayList<String> dbListIngredients;
 
+    private SharedPreferences preferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,11 +74,7 @@ public class ActivityAddRecipeStep2 extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ActivityAddRecipeStep2.this,ActivityAddRecipeStep3.class);
-
-                intent.putStringArrayListExtra("DB_QUANTITIES",dbListQuantities);
-                intent.putStringArrayListExtra("DB_UNITS",dbListUnits);
-                intent.putStringArrayListExtra("DB_INGREDIENTS",dbListIngredients);
-
+                addPreferences();
                 startActivity(intent);
             }
         });
@@ -109,17 +108,14 @@ public class ActivityAddRecipeStep2 extends Activity {
         adapterListviewIngredients = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listFullIngredients);
         listviewIngredients.setAdapter(adapterListviewIngredients);
 
-
-        //for the database
+        //for the preferences & database
         dbListQuantities = new ArrayList<String>();
         dbListUnits = new ArrayList<String>();
         dbListIngredients = new ArrayList<String>();
 
-
+        //preparation of the lists for the auto complete edit text
         initUnits();
         initIngredients();
-
-
 
         //init the listview and its alertdialog to delete items
         listviewIngredients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -190,7 +186,7 @@ public class ActivityAddRecipeStep2 extends Activity {
                         }
                     });
 
-            //confirm the new newIngredient, addFullIngredient it to the database
+            //confirm the new ingredient, add full ingredient in the database
             alertDialogNewIngredient.setButton2("Confirmer",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
@@ -220,9 +216,6 @@ public class ActivityAddRecipeStep2 extends Activity {
     private void addFullIngredient(){
 
         dbIngredient = new Quantite();
-
-
-
         //handle quantity
         if(edittextQuantity.getText().length()==0){
             dbListQuantities.add("0");
@@ -277,9 +270,6 @@ public class ActivityAddRecipeStep2 extends Activity {
         autoUnit.getText().clear();
         edittextQuantity.getText().clear();
         autoIngredient.getText().clear();
-
-
-
     }
 
     private void initUnits(){
@@ -339,5 +329,24 @@ public class ActivityAddRecipeStep2 extends Activity {
         alertDialog.show();
 
     }
+
+    private void addPreferences(){
+
+        preferences =  getApplicationContext().getSharedPreferences("ADD_RECIPE", 0);
+        SharedPreferences.Editor editor = preferences.edit();
+
+
+        editor.putInt("Quantities_size", dbListIngredients.size());
+            for (int i = 0; i < dbListIngredients.size(); i++) {
+                editor.remove("Quantities_" + i);
+                editor.putString("Quantities_" + i, dbListQuantities.get(i).toString());
+                editor.remove("Units_" + i);
+                editor.putString("Units_" + i, dbListUnits.get(i).toString());
+                editor.remove("Ingredients_" + i);
+                editor.putString("Ingredients_" + i, dbListIngredients.get(i).toString());
+                   }
+        editor.commit();
+        }
+
 
 }

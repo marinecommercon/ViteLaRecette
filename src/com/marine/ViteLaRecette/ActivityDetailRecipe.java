@@ -271,18 +271,27 @@ public class ActivityDetailRecipe extends Activity {
             public void onClick(DialogInterface dialog, int id) {
             }
         });
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Bannir l'ingredient", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                quantiteSelected.get(arg).getIngredient().setFavoris(-1);
-                MainActivity.ingredientDao.update(quantiteSelected.get(arg).getIngredient());
-            }
-        });
-        alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Restaurer l'ingredient", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                quantiteSelected.get(arg).getIngredient().setFavoris(0);
-                MainActivity.ingredientDao.update(quantiteSelected.get(arg).getIngredient());
-            }
-        });
+
+        if(quantiteSelected.get(arg).getIngredient().getFavoris()==0) {
+
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Bannir l'ingredient", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    quantiteSelected.get(arg).getIngredient().setFavoris(-1);
+                    MainActivity.ingredientDao.update(quantiteSelected.get(arg).getIngredient());
+                }
+            });
+        }
+
+        else if(quantiteSelected.get(arg).getIngredient().getFavoris()==-1) {
+
+            alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Restaurer l'ingredient", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    quantiteSelected.get(arg).getIngredient().setFavoris(0);
+                    MainActivity.ingredientDao.update(quantiteSelected.get(arg).getIngredient());
+                }
+            });
+        }
+
         alertDialog.show();
     }
 

@@ -63,11 +63,6 @@ public class ActivityAddRecipeStep4 extends Activity {
         setContentView(R.layout.activity_add_recipe_step4);
 
         Intent intent = getIntent();
-
-        dbListQuantities = intent.getStringArrayListExtra("DB_QUANTITIES");
-        dbListUnits = intent.getStringArrayListExtra("DB_UNITS");
-        dbListIngredients = intent.getStringArrayListExtra("DB_INGREDIENTS");
-
         initUI(this);
 
     }
@@ -81,6 +76,7 @@ public class ActivityAddRecipeStep4 extends Activity {
 
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(ActivityAddRecipeStep4.this,MainActivity.class);
                 startActivity(intent);
             }
@@ -110,10 +106,14 @@ public class ActivityAddRecipeStep4 extends Activity {
         textViewPrice = (TextView) findViewById(R.id.textViewPriceID);
         textViewDescription = (TextView) findViewById(R.id.textViewDescriptionID);
 
-
         initValues();
+
+        dbListQuantities = new ArrayList<String>();
+        dbListUnits = new ArrayList<String>();
+        dbListIngredients = new ArrayList<String>();
+
         getPrefs();
-        for (int i=0 ; i<dbListIngredients.size() ; i++){addFullIngredient(i);}
+        for (int i=0 ; i<dbListQuantities.size() ; i++){addFullIngredient(i);}
 
 
         textViewName.setText(name);
@@ -161,6 +161,16 @@ public class ActivityAddRecipeStep4 extends Activity {
         difficulty = preferences.getString("ADD_RECIPE_DIFFICULTY", "");
         price = preferences.getString("ADD_RECIPE_PRICE", "");
         steps = preferences.getString("ADD_RECIPE_STEPS", "");
+
+        int sizeQuantities = preferences.getInt("Quantities_size", 0);
+        dbListQuantities.clear();
+
+        for (int i = 0; i < sizeQuantities; i++) {
+
+                dbListQuantities.add(""+preferences.getString("Quantities_" + i, "").toString());
+                dbListUnits.add(""+preferences.getString("Units_" + i, "").toString());
+                dbListIngredients.add(""+preferences.getString("Ingredients_" + i, "").toString());
+            }
     }
 
     private void addFullIngredient(int i){
