@@ -74,28 +74,44 @@ public class ActivitySeeResults extends ListActivity {
 		int place;
 		Recette recTemp;
 
+        //For each recipe of the whole list (listRecipes)
+        //We take the first one
 		while (i < list.size()) {
 
 			place = i;
 			recTemp = list.get(i);
 
+            //Then, we check all recipes below (j=i to the end)
+            //If one condition is such as expected (for example less time for the preparation), the recipe should go one the top of the list
+            //P1 is the major condition
+
 			for (int j = i; j < list.size(); j++) {
 
-				if ((condition(recTemp, list.get(j), p1))
-						|| (condition(recTemp, list.get(j), p1 + 2) && condition(
-								recTemp, list.get(j), p2))
-						|| (condition(recTemp, list.get(j), p1 + 2)
-								&& condition(recTemp, list.get(j), p2 + 2) && condition(
-									recTemp, list.get(j), p3))
-						|| (condition(recTemp, list.get(j), p1 + 2)
-								&& condition(recTemp, list.get(j), p2 + 2)
-								&& condition(recTemp, list.get(j), p3 + 2) && condition(
-									recTemp, list.get(j), p4))) {
-					place = j;
+				if (
+                        //p1 such as expected
+                        (condition(recTemp, list.get(j), p1))
+
+                        // or p1 is "==" but p2 such as expected
+						|| (condition(recTemp, list.get(j), p1 + 2) && condition(recTemp, list.get(j), p2))
+
+                        //or p1 is "==", p2 is "==" but p3 is such as expected
+						|| (condition(recTemp, list.get(j), p1 + 2) && condition(recTemp, list.get(j), p2 + 2) && condition(recTemp, list.get(j), p3))
+
+                        //or p1 is "==", p2 is "==" but p3 is "==" but p4 is such as expected
+						|| (condition(recTemp, list.get(j), p1 + 2) && condition(recTemp, list.get(j), p2 + 2) && condition(recTemp, list.get(j), p3 + 2) && condition(recTemp, list.get(j), p4))) {
+
+
+                    place = j;
 					recTemp = list.get(j);
+
 				}
 
 			}
+
+            //When all recipes below have been checked, if RecipeJ is better than RecipeI they exchange from position
+            //If not, nothing change
+
+            // Problème : pas de comparaison avec les précédents
 
 			list.set(place, list.get(i));
 			list.set(i, recTemp);
@@ -127,20 +143,18 @@ public class ActivitySeeResults extends ListActivity {
 			return R1.getScore().equals(R2.getScore());
 
 		case 'T':
-			return R1.getCuisson() + R1.getPreparation() > R2.getCuisson()
-					+ R2.getPreparation();
+            //time increasing
+			return R1.getCuisson() + R1.getPreparation() > R2.getCuisson() + R2.getPreparation();
 
 		case 'T' + 1:
-			return R1.getCuisson() + R1.getPreparation() < R2.getCuisson()
-					+ R2.getPreparation();
+            //time decreasing
+			return R1.getCuisson() + R1.getPreparation() < R2.getCuisson() + R2.getPreparation();
 
 		case 'T' + 2:
-			return R1.getCuisson() + R1.getPreparation() == R2.getCuisson()
-					+ R2.getPreparation();
+			return R1.getCuisson() + R1.getPreparation() == R2.getCuisson() + R2.getPreparation();
 
 		case 'T' + 3:
-			return R1.getCuisson() + R1.getPreparation() == R2.getCuisson()
-					+ R2.getPreparation();
+			return R1.getCuisson() + R1.getPreparation() == R2.getCuisson()	+ R2.getPreparation();
 
 		case 'D':
 			return R1.getDifficulte() > R2.getDifficulte();
@@ -181,11 +195,11 @@ public class ActivitySeeResults extends ListActivity {
 
 		listOptions.add("Ranger par occurence d'ingredients");
 		listOptions.add("Ranger par temps croissant");
-		listOptions.add("Ranger par temps decroissant");
+		//listOptions.add("Ranger par temps decroissant");
 		listOptions.add("Ranger par difficulte croissante");
-		listOptions.add("Ranger par difficulte decroissante");
+		//listOptions.add("Ranger par difficulte decroissante");
 		listOptions.add("Ranger par prix croissant");
-		listOptions.add("Ranger par prix decroissant");
+		//listOptions.add("Ranger par prix decroissant");
 
 		adapterOptions = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listOptions);
 
@@ -207,25 +221,25 @@ public class ActivitySeeResults extends ListActivity {
                         putInOrder(listRecipes, 'T', 'I', 'D', 'P');
                         break;
 
-                    case 2:
+                    /**case 2:
                         putInOrder(listRecipes, 'T' + 1, 'I', 'D', 'P');
-                        break;
+                        break;**/
 
-                    case 3:
+                    case 2:
                         putInOrder(listRecipes, 'D', 'I', 'T', 'P');
                         break;
 
-                    case 4:
+                    /**case 4:
                         putInOrder(listRecipes, 'D' + 1, 'I', 'T', 'P');
-                        break;
+                        break;**/
 
-                    case 5:
+                    case 3:
                         putInOrder(listRecipes, 'P', 'I', 'T', 'D');
                         break;
 
-                    case 6:
+                    /**case 6:
                         putInOrder(listRecipes, 'P' + 1, 'I', 'T', 'D');
-                        break;
+                        break;**/
 
                     default:
                         putInOrder(listRecipes, 'I', 'T', 'D', 'P');
@@ -249,7 +263,7 @@ public class ActivitySeeResults extends ListActivity {
 	
 
 	
-
+    // Main request (all recipes included preferences)
 	private void findRecettes() {
 
         String MY_QUERY;
@@ -289,13 +303,11 @@ public class ActivitySeeResults extends ListActivity {
                 + "ON INGREDIENT.CATEGORIE_ID = CATEGORIE._id "
                 + "WHERE CATEGORIE.FAVORIS = -1 "
                 + "OR INGREDIENT.FAVORIS = -1 ) "
-                + "GROUP BY RECETTE._id "
-                + "ORDER BY RECETTE.NOM ASC";
+                + "GROUP BY RECETTE._id ";
 
         cursor = MainActivity.db.rawQuery(MY_QUERY, null);
 		
 	}
-	
 
 	private void initListRecipes(){
 
@@ -308,7 +320,7 @@ public class ActivitySeeResults extends ListActivity {
 		cursor.close();
 	}
 	
-
+    //Check ingredients and give a score (+1 for each matching ingredient)
 	private void initScore(){
 		
 		if ((ingredientAId >= 0) || (ingredientBId >= 0) || (ingredientCId >= 0)) {
@@ -319,6 +331,8 @@ public class ActivitySeeResults extends ListActivity {
 							Properties.IngredientId.eq(ingredientCId)).list();
 
 			for (int i = 0; i < listRecipes.size(); i++) {
+
+                flag = 0 ;
 
 				for (int j = 0; j < listMatchingRecipes.size(); j++) {
 					if (listRecipes.get(i).getId() == listMatchingRecipes.get(j).getRecetteId()) {
@@ -332,7 +346,6 @@ public class ActivitySeeResults extends ListActivity {
 		}
 		
 	}
-	
 
 	private void initAdapter(){
 		adapter = new AdapterPersonalSearch(this, listRecipes);
