@@ -1,6 +1,8 @@
 package com.marine.ViteLaRecette;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.app.ListActivity;
@@ -18,33 +20,33 @@ import com.marine.ViteLaRecette.dao.Recette;
 
 public class ActivitySeeResults extends ListActivity {
 
-	private String typeOfDish;
-	private long ingredientAId;
-	private long ingredientBId;
-	private long ingredientCId;
-	private Cursor cursor;
-	private int flag;
-	private ArrayList<Recette> listRecipes;
-	private List<Quantite> listMatchingRecipes;
-	private Spinner spinnerChangeOrder;
-	private AdapterPersonalSearch adapter;
-	private List<String> listOptions;
-	private ArrayAdapter<String> adapterOptions;
+    private String typeOfDish;
+    private long ingredientAId;
+    private long ingredientBId;
+    private long ingredientCId;
+    private Cursor cursor;
+    private int flag;
+    private ArrayList<Recette> listRecipes;
+    private List<Quantite> listMatchingRecipes;
+    private Spinner spinnerChangeOrder;
+    private AdapterPersonalSearch adapter;
+    private List<String> listOptions;
+    private ArrayAdapter<String> adapterOptions;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
 
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-		typeOfDish = this.getIntent().getStringExtra("Type");
-		ingredientAId = this.getIntent().getLongExtra("IngredientA", -1);
-		ingredientBId = this.getIntent().getLongExtra("IngredientB", -1);
-		ingredientCId = this.getIntent().getLongExtra("IngredientC", -1);
+        typeOfDish = this.getIntent().getStringExtra("Type");
+        ingredientAId = this.getIntent().getLongExtra("IngredientA", -1);
+        ingredientBId = this.getIntent().getLongExtra("IngredientB", -1);
+        ingredientCId = this.getIntent().getLongExtra("IngredientC", -1);
 
-		setContentView(R.layout.activity_see_results);
+        setContentView(R.layout.activity_see_results);
 
-		findRecettes();
-		initListRecipes();
+        findRecettes();
+        initListRecipes();
 
         if(listRecipes.size()==0) {
             Toast.makeText(getApplicationContext(), "Aucune recette n'a été trouvée", Toast.LENGTH_SHORT).show();
@@ -52,226 +54,32 @@ public class ActivitySeeResults extends ListActivity {
         }
 
         else {
-            initScore();
+
+            getListView().setVisibility(View.INVISIBLE);
             initAdapter();
             fulfilSpinnerChangeOrder();
         }
-	}
+    }
 
 
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		id = listRecipes.get(position).getId();
-		Intent intent = new Intent(ActivitySeeResults.this,ActivityDetailRecipe.class);
-		intent.putExtra("ID", (int) id);
-		startActivity(intent);
-	}
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        id = listRecipes.get(position).getId();
+        Intent intent = new Intent(ActivitySeeResults.this,ActivityDetailRecipe.class);
+        intent.putExtra("ID", (int) id);
+        startActivity(intent);
+    }
 
 
-	private void putInOrder(List<Recette> list, int p1, int p2, int p3, int p4) {
-
-		int i = 0;
-		int place;
-		Recette recTemp;
-
-        //For each recipe of the whole list (listRecipes)
-        //We take the first one
-		while (i < list.size()) {
-
-			place = i;
-			recTemp = list.get(i);
-
-            //Then, we check all recipes below (j=i to the end)
-            //If one condition is such as expected (for example less time for the preparation), the recipe should go one the top of the list
-            //P1 is the major condition
-
-			for (int j = i; j < list.size(); j++) {
-
-				if (
-                        //p1 such as expected
-                        (condition(recTemp, list.get(j), p1))
-
-                        // or p1 is "==" but p2 such as expected
-						|| (condition(recTemp, list.get(j), p1 + 2) && condition(recTemp, list.get(j), p2))
-
-                        //or p1 is "==", p2 is "==" but p3 is such as expected
-						|| (condition(recTemp, list.get(j), p1 + 2) && condition(recTemp, list.get(j), p2 + 2) && condition(recTemp, list.get(j), p3))
-
-                        //or p1 is "==", p2 is "==" but p3 is "==" but p4 is such as expected
-						|| (condition(recTemp, list.get(j), p1 + 2) && condition(recTemp, list.get(j), p2 + 2) && condition(recTemp, list.get(j), p3 + 2) && condition(recTemp, list.get(j), p4))) {
-
-
-                    place = j;
-					recTemp = list.get(j);
-
-				}
-
-			}
-
-            //When all recipes below have been checked, if RecipeJ is better than RecipeI they exchange from position
-            //If not, nothing change
-
-            // Problème : pas de comparaison avec les précédents
-
-			list.set(place, list.get(i));
-			list.set(i, recTemp);
-
-			i++;
-
-		}
-
-	}
-
-
-	private boolean condition(Recette R1, Recette R2, int c) {
-
-		switch (c) {
-
-		case 0:
-			return false;
-
-		case 'I':
-			return R1.getScore() < R2.getScore();
-
-		case 'I' + 1:
-			return R1.getScore() > R2.getScore();
-
-		case 'I' + 2:
-			return R1.getScore().equals(R2.getScore());
-
-		case 'I' + 3:
-			return R1.getScore().equals(R2.getScore());
-
-		case 'T':
-            //time increasing
-			return R1.getCuisson() + R1.getPreparation() > R2.getCuisson() + R2.getPreparation();
-
-		case 'T' + 1:
-            //time decreasing
-			return R1.getCuisson() + R1.getPreparation() < R2.getCuisson() + R2.getPreparation();
-
-		case 'T' + 2:
-			return R1.getCuisson() + R1.getPreparation() == R2.getCuisson() + R2.getPreparation();
-
-		case 'T' + 3:
-			return R1.getCuisson() + R1.getPreparation() == R2.getCuisson()	+ R2.getPreparation();
-
-		case 'D':
-			return R1.getDifficulte() > R2.getDifficulte();
-
-		case 'D' + 1:
-			return R1.getDifficulte() < R2.getDifficulte();
-
-		case 'D' + 2:
-			return R1.getDifficulte().equals(R2.getDifficulte());
-
-		case 'D' + 3:
-			return R1.getDifficulte().equals(R2.getDifficulte());
-
-		case 'P':
-			return R1.getPrix() > R2.getPrix();
-
-		case 'P' + 1:
-			return R1.getPrix() < R2.getPrix();
-
-		case 'P' + 2:
-			return R1.getPrix().equals(R2.getPrix());
-
-		case 'P' + 3:
-			return R1.getPrix().equals(R2.getPrix());
-
-		default:
-			return false;
-
-		}
-
-	}
-
-
-	public void fulfilSpinnerChangeOrder() {
-
-		spinnerChangeOrder = (Spinner) findViewById(R.id.spinnerChangeOrder);
-		listOptions = new ArrayList<String>();
-
-		listOptions.add("Ranger par occurence d'ingredients");
-		listOptions.add("Ranger par temps croissant");
-		//listOptions.add("Ranger par temps decroissant");
-		listOptions.add("Ranger par difficulte croissante");
-		//listOptions.add("Ranger par difficulte decroissante");
-		listOptions.add("Ranger par prix croissant");
-		//listOptions.add("Ranger par prix decroissant");
-
-		adapterOptions = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listOptions);
-
-		adapterOptions.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerChangeOrder.setAdapter(adapterOptions);
-
-		spinnerChangeOrder.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> parentView,
-                                       View selectedItemView, int position, long id) {
-                switch (position) {
-
-                    case 0:
-                        putInOrder(listRecipes, 'I', 'T', 'D', 'P');
-                        break;
-
-                    case 1:
-                        putInOrder(listRecipes, 'T', 'I', 'D', 'P');
-                        break;
-
-                    /**case 2:
-                        putInOrder(listRecipes, 'T' + 1, 'I', 'D', 'P');
-                        break;**/
-
-                    case 2:
-                        putInOrder(listRecipes, 'D', 'I', 'T', 'P');
-                        break;
-
-                    /**case 4:
-                        putInOrder(listRecipes, 'D' + 1, 'I', 'T', 'P');
-                        break;**/
-
-                    case 3:
-                        putInOrder(listRecipes, 'P', 'I', 'T', 'D');
-                        break;
-
-                    /**case 6:
-                        putInOrder(listRecipes, 'P' + 1, 'I', 'T', 'D');
-                        break;**/
-
-                    default:
-                        putInOrder(listRecipes, 'I', 'T', 'D', 'P');
-                        break;
-
-                }
-
-                adapter.notifyDataSetChanged();
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-
-            }
-
-        });
-
-	}
-	
-
-	
     // Main request (all recipes included preferences)
-	private void findRecettes() {
+    private void findRecettes() {
 
         String MY_QUERY;
 
         if (typeOfDish.equals("Peu importe")) {
 
-        //Query = Get the quantities to compare them with the ingredients
-        MY_QUERY = "SELECT RECETTE._id " + "FROM RECETTE "
+            //Query = Get the quantities to compare them with the ingredients
+            MY_QUERY = "SELECT RECETTE._id " + "FROM RECETTE "
                     + "INNER JOIN QUANTITE "
                     + "ON RECETTE._id = QUANTITE.RECETTE_ID "
                     + "INNER JOIN INGREDIENT "
@@ -279,13 +87,13 @@ public class ActivitySeeResults extends ListActivity {
                     + "AND RECETTE.FAVORIS <> -1 ";
         } else {
 
-        MY_QUERY = "SELECT RECETTE._id " + "FROM RECETTE "
-                + "INNER JOIN QUANTITE "
-                + "ON RECETTE._id = QUANTITE.RECETTE_ID "
-                + "INNER JOIN INGREDIENT "
-                + "ON QUANTITE.INGREDIENT_ID = INGREDIENT._id "
-                + "WHERE RECETTE.TYPE = '" + typeOfDish + "' "
-                + "AND RECETTE.FAVORIS <> -1 ";
+            MY_QUERY = "SELECT RECETTE._id " + "FROM RECETTE "
+                    + "INNER JOIN QUANTITE "
+                    + "ON RECETTE._id = QUANTITE.RECETTE_ID "
+                    + "INNER JOIN INGREDIENT "
+                    + "ON QUANTITE.INGREDIENT_ID = INGREDIENT._id "
+                    + "WHERE RECETTE.TYPE = '" + typeOfDish + "' "
+                    + "AND RECETTE.FAVORIS <> -1 ";
         }
 
         if ((ingredientAId >= 0) || (ingredientBId >= 0) || (ingredientCId >= 0)) {
@@ -306,52 +114,147 @@ public class ActivitySeeResults extends ListActivity {
                 + "GROUP BY RECETTE._id ";
 
         cursor = MainActivity.db.rawQuery(MY_QUERY, null);
-		
-	}
 
-	private void initListRecipes(){
+    }
 
-		listRecipes = new ArrayList<Recette>();
-		if (cursor.moveToFirst()) {
-			do {
-				listRecipes.add(MainActivity.recetteDao.load((long) cursor.getInt(0)));
-			} while (cursor.moveToNext());
-		}
-		cursor.close();
-	}
-	
-    //Check ingredients and give a score (+1 for each matching ingredient)
-	private void initScore(){
-		
-		if ((ingredientAId >= 0) || (ingredientBId >= 0) || (ingredientCId >= 0)) {
-			listMatchingRecipes = MainActivity.quantiteDao
-					.queryBuilder()
-					.whereOr(Properties.IngredientId.eq(ingredientAId),
-							Properties.IngredientId.eq(ingredientBId),
-							Properties.IngredientId.eq(ingredientCId)).list();
+    private void initListRecipes(){
 
-			for (int i = 0; i < listRecipes.size(); i++) {
+        listRecipes = new ArrayList<Recette>();
+        if (cursor.moveToFirst()) {
+            do {
+                listRecipes.add(MainActivity.recetteDao.load((long) cursor.getInt(0)));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+    }
 
-                flag = 0 ;
+    private void initAdapter(){
+        adapter = new AdapterPersonalSearch(this, listRecipes);
+        setListAdapter(adapter);
+    }
 
-				for (int j = 0; j < listMatchingRecipes.size(); j++) {
-					if (listRecipes.get(i).getId() == listMatchingRecipes.get(j).getRecetteId()) {
-						flag = flag + 1;
-					}
-				}
+    public void fulfilSpinnerChangeOrder() {
 
-				listRecipes.get(i).setScore(flag);
+        spinnerChangeOrder = (Spinner) findViewById(R.id.spinnerChangeOrder);
+        listOptions = new ArrayList<String>();
 
-			}
-		}
-		
-	}
+        listOptions.add("Ranger par temps croissant");
+        listOptions.add("Ranger par difficulté croissante");
+        listOptions.add("Ranger par prix croissant");
 
-	private void initAdapter(){
-		adapter = new AdapterPersonalSearch(this, listRecipes);
-		setListAdapter(adapter);
-	}
-	
-	
+        adapterOptions = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listOptions);
+
+        adapterOptions.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerChangeOrder.setAdapter(adapterOptions);
+
+        spinnerChangeOrder.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parentView,
+                                       View selectedItemView, int position, long id) {
+                switch (position) {
+
+                    case 0:
+                        putInOrder('I');
+                        break;
+
+                    case 1:
+                        putInOrder('D');
+                        break;
+
+                    case 2:
+                        putInOrder('P');
+                        break;
+
+                    default:
+                        putInOrder('I');
+                        break;
+
+                }
+
+                adapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+        });
+    }
+
+    private void putInOrder(int criterion) {
+
+        int score = 0;
+
+        switch (criterion) {
+
+            //The smallest score will be at the top of the list
+            case 'I':
+                getListView().setVisibility(View.INVISIBLE);
+                for (int i = 0; i < listRecipes.size(); i++) {
+                    score = getScoreIngredient(listRecipes.get(i)) * 100 + listRecipes.get(i).getPreparation() + listRecipes.get(i).getCuisson();
+                    listRecipes.get(i).setScore(score);
+                    getListView().setVisibility(View.VISIBLE);
+                }
+                break;
+
+            case 'D':
+                getListView().setVisibility(View.INVISIBLE);
+                for (int i = 0; i < listRecipes.size(); i++) {
+                    score = listRecipes.get(i).getDifficulte() * 100 + listRecipes.get(i).getPreparation() + listRecipes.get(i).getCuisson();
+                    listRecipes.get(i).setScore(score);
+                    getListView().setVisibility(View.VISIBLE);
+                }
+                break;
+
+            case 'P':
+                getListView().setVisibility(View.INVISIBLE);
+                for (int i = 0; i < listRecipes.size(); i++) {
+                    score = listRecipes.get(i).getPrix() * 100 + listRecipes.get(i).getPreparation() + listRecipes.get(i).getCuisson();
+                    listRecipes.get(i).setScore(score);
+                    getListView().setVisibility(View.VISIBLE);
+                }
+                break;
+        }
+
+                Collections.sort(listRecipes, new Comparator<Recette>() {
+                    @Override
+                    public int compare(Recette recipe1, Recette recipe2) {
+                        return recipe1.getScore().compareTo(recipe2.getScore());
+                    }
+                });
+
+    }
+
+
+
+    //Get the score for the matching with ingredients.
+    private int getScoreIngredient(Recette recipe) {
+
+        int score = 0;
+
+        if ((ingredientAId >= 0) || (ingredientBId >= 0) || (ingredientCId >= 0)) {
+            listMatchingRecipes = MainActivity.quantiteDao
+                    .queryBuilder()
+                    .whereOr(Properties.IngredientId.eq(ingredientAId),
+                            Properties.IngredientId.eq(ingredientBId),
+                            Properties.IngredientId.eq(ingredientCId)).list();
+
+
+            for (int j = 0; j < listMatchingRecipes.size(); j++) {
+
+                if (recipe.getId() == listMatchingRecipes.get(j).getRecetteId()) {
+                    score = score + 1;
+                }
+            }
+        }
+        score = 3 - score;
+        return score;
+    }
+
+
+
+
 
 }
