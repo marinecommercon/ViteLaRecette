@@ -41,20 +41,21 @@
        	 	android:id="@+id/autoCompleteTextViewIngredientA"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
+            android:singleLine="true"
         	android:text="" />
 
     		<AutoCompleteTextView
         	android:id="@+id/autoCompleteTextViewIngredientB"
        		android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
-        	android:ems="10"
+            android:singleLine="true"
         	android:text="" />
 
     		<AutoCompleteTextView
         	android:id="@+id/autoCompleteTextViewIngredientC"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
-        	android:ems="10"
+            android:singleLine="true"
         	android:text="" />
 
             

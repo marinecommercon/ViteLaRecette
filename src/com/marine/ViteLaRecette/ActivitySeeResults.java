@@ -198,20 +198,22 @@ public class ActivitySeeResults extends ListActivity {
         int scoreDifficulty = 0;
         int scorePrice = 0;
 
+        for (int i = 0; i < listRecipes.size(); i++) {
+            scoreIngredients = 0;
+
         if ((ingredientAId >= 0) || (ingredientBId >= 0) || (ingredientCId >= 0)) {
             listMatchingRecipes = MainActivity.quantiteDao
                     .queryBuilder()
                     .whereOr(Properties.IngredientId.eq(ingredientAId),
                             Properties.IngredientId.eq(ingredientBId),
                             Properties.IngredientId.eq(ingredientCId)).list();
-        }
 
-        for (int i = 0; i < listRecipes.size(); i++) {
-            scoreIngredients = 0;
 
-            for (int j = 0; j < listMatchingRecipes.size(); j++) {
-                if (listRecipes.get(i).getId() == listMatchingRecipes.get(j).getRecetteId()) {
-                    scoreIngredients = scoreIngredients + 1;
+
+                for (int j = 0; j < listMatchingRecipes.size(); j++) {
+                    if (listRecipes.get(i).getId() == listMatchingRecipes.get(j).getRecetteId()) {
+                        scoreIngredients = scoreIngredients + 1;
+                    }
                 }
             }
 
@@ -236,10 +238,7 @@ public class ActivitySeeResults extends ListActivity {
                     listRecipes.get(i).setScore(scoreFinal);
                     break;
             }
-
-            System.out.println("score " + scoreFinal);
         }
-
     }
 
 
