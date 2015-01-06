@@ -49,7 +49,10 @@ public class AdapterPersonalSearch extends BaseAdapter {
 
 			holder = new ViewHolder();
 			convertView = inflater.inflate(R.layout.item_adapter_personal_search, null);
+
 			holder.nom = (TextView) convertView.findViewById(R.id.nom);
+            holder.type = (TextView) convertView.findViewById(R.id.type);
+
 			convertView.setTag(holder);
 
 		} else {
@@ -57,12 +60,15 @@ public class AdapterPersonalSearch extends BaseAdapter {
 		}
 
 		holder.nom.setText(liste.get(position).getNom());
+        holder.type.setText(liste.get(position).getType());
+
 		return convertView;
 
 	}
 
 	private class ViewHolder {
 		TextView nom;
+        TextView type;
     }
 
 }

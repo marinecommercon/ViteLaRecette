@@ -9,7 +9,6 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -25,7 +24,6 @@ public class ActivitySeeResults extends ListActivity {
     private long ingredientBId;
     private long ingredientCId;
     private Cursor cursor;
-    private int flag;
     private ArrayList<Recette> listRecipes;
     private List<Quantite> listMatchingRecipes;
     private Spinner spinnerChangeOrder;
@@ -45,8 +43,8 @@ public class ActivitySeeResults extends ListActivity {
 
         setContentView(R.layout.activity_see_results);
 
-        findRecettes();
-        initListRecipes();
+        findRecipes();
+        initList();
 
         if(listRecipes.size()==0) {
             Toast.makeText(getApplicationContext(), "Aucune recette n'a été trouvée", Toast.LENGTH_SHORT).show();
@@ -70,7 +68,7 @@ public class ActivitySeeResults extends ListActivity {
 
 
     // Main request (all recipes included preferences)
-    private void findRecettes() {
+    private void findRecipes() {
 
         String MY_QUERY;
 
@@ -115,7 +113,7 @@ public class ActivitySeeResults extends ListActivity {
 
     }
 
-    private void initListRecipes(){
+    private void initList(){
 
         listRecipes = new ArrayList<Recette>();
         if (cursor.moveToFirst()) {
@@ -187,7 +185,6 @@ public class ActivitySeeResults extends ListActivity {
             }
         });
     }
-
 
     //Get the score for the matching with ingredients.
     private void getScore(int choice) {

@@ -4,20 +4,27 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.*;
+import com.marine.ViteLaRecette.adapter.AdapterPersonalSearch;
 import com.marine.ViteLaRecette.dao.Recette;
 import com.marine.ViteLaRecette.dao.RecetteDao;
+
+import java.util.ArrayList;
 
 
 public class ActivityAllRecipes extends ListActivity {
 
-	private Cursor cursor;
-	private String textColumn;
-	private String orderBy;
-	private SimpleCursorAdapter adapter;
+    private Cursor cursor;
+    private String textColumn;
+    private String orderBy;
+    private AdapterPersonalSearch adapter;
+    private ArrayList<Recette> listRecipes;
     private int position;
     private int globalHeight;
     private double letterHeight;
@@ -25,63 +32,77 @@ public class ActivityAllRecipes extends ListActivity {
     private String[] alphabeticalList = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
 
 
-    @Override
-	public void onCreate(Bundle savedInstanceState) {
 
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_all_recipes);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_all_recipes);
+
 
         addLetters();
-		findRecipes();
-		initList();
-	}
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        position = cursor.getPosition();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         findRecipes();
         initList();
-        getListView().setSelection(position);
+        initAdapter();
     }
 
+
     @Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Intent intent = new Intent(ActivityAllRecipes.this,ActivityDetailRecipe.class);
-		intent.putExtra("ID", (int) id);
-		startActivity(intent);
-		cursor.requery();
-	}
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        id = listRecipes.get(position).getId();
+        Intent intent = new Intent(ActivityAllRecipes.this,ActivityDetailRecipe.class);
+        intent.putExtra("ID", (int) id);
+        startActivity(intent);
+    }
 
-	private void findRecipes(){
-		
-		textColumn = RecetteDao.Properties.Nom.columnName;
-		orderBy = textColumn + " COLLATE LOCALIZED ASC";
+    private void findRecipes(){
 
-		cursor = MainActivity.db.query(MainActivity.recetteDao.getTablename(),
-				MainActivity.recetteDao.getAllColumns(), null, null, null,
-				null, orderBy);
+        String MY_QUERY;
+
+            //Query = Get the quantities to compare them with the ingredients
+            MY_QUERY = "SELECT RECETTE._id " + "FROM RECETTE "
+                    + "INNER JOIN QUANTITE "
+                    + "ON RECETTE._id = QUANTITE.RECETTE_ID "
+                    + "INNER JOIN INGREDIENT "
+                    + "ON QUANTITE.INGREDIENT_ID = INGREDIENT._id "
+                    + "AND RECETTE.FAVORIS <> -1 ";
+
+            MY_QUERY = MY_QUERY + "AND RECETTE._id NOT IN ( " + "SELECT RECETTE._id "
+                    + "FROM RECETTE " + "INNER JOIN QUANTITE "
+                    + "ON RECETTE._id = QUANTITE.RECETTE_ID "
+                    + "INNER JOIN INGREDIENT "
+                    + "ON QUANTITE.INGREDIENT_ID = INGREDIENT._id "
+                    + "INNER JOIN CATEGORIE "
+                    + "ON INGREDIENT.CATEGORIE_ID = CATEGORIE._id "
+                    + "WHERE CATEGORIE.FAVORIS = -1 "
+                    + "OR INGREDIENT.FAVORIS = -1 ) "
+                    + "GROUP BY RECETTE._id "
+                    + "ORDER BY RECETTE.NOM COLLATE NOCASE ASC";
+
+        cursor = MainActivity.db.rawQuery(MY_QUERY, null);
+    }
 
 
+    private void initList(){
 
-			}
-	
+            listRecipes = new ArrayList<Recette>();
+            if (cursor.moveToFirst()) {
+                do {
+                    listRecipes.add(MainActivity.recetteDao.load((long) cursor.getInt(0)));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
 
-	private void initList(){
-		String[] from = { textColumn, RecetteDao.Properties.Type.columnName };
-		int[] to = { R.id.textViewRecipeNameID, R.id.textViewRecipeTypeID };
-		adapter = new SimpleCursorAdapter(this, R.layout.activity_all_recipes_list, cursor, from, to);
-		setListAdapter(adapter);
-       }
+    private void initAdapter(){
+        adapter = new AdapterPersonalSearch(this, listRecipes);
+        setListAdapter(adapter);
+    }
 
 
     private void addLetters(){
+
+        final Animation anim = AnimationUtils.loadAnimation(this, R.anim.scale);
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -92,58 +113,64 @@ public class ActivityAllRecipes extends ListActivity {
         LinearLayout linearLayoutLetters = (LinearLayout) findViewById(R.id.linearLayoutLettersID);
 
         final TextView[] textViewLetter = new TextView[26];
-                for(int i=0; i<26; i++) {
-                    textViewLetter[i] = new TextView(this);
-                    textViewLetter[i].setHeight((int) letterHeight);
-                    textViewLetter[i].setText(alphabeticalList[i].toString());
-                    textViewLetter[i].setTextSize(15);
-                    textViewLetter[i].setGravity(Gravity.CENTER_HORIZONTAL);
-                    textViewLetter[i].setTag(alphabeticalList[i].toString());
-                    linearLayoutLetters.addView(textViewLetter[i]);
-                    textViewLetter[i].setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    findPosition(v, null);
-                                    }
-                            });
+        for(int i=0; i<26; i++) {
+            textViewLetter[i] = new TextView(this);
+            textViewLetter[i].setHeight((int) letterHeight);
+            textViewLetter[i].setText(alphabeticalList[i].toString());
+            textViewLetter[i].setTextSize(15);
+            textViewLetter[i].setGravity(Gravity.CENTER_HORIZONTAL);
+            textViewLetter[i].setTag(alphabeticalList[i].toString());
+            linearLayoutLetters.addView(textViewLetter[i]);
+
+            textViewLetter[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    findPosition(v, null);
+                    v.startAnimation(anim);
+
+
 
                 }
+            });
+
+        }
     }
 
 
     private void findPosition(View v, String tag) {
-        int i =0;
 
-        recipe = MainActivity.recetteDao.queryBuilder()
-                .where(RecetteDao.Properties.Id.eq(getListAdapter().getItemId(0)))
-                .unique();
+    int i = 0;
+    final Animation anim = AnimationUtils.loadAnimation(this, R.anim.scale);
 
-        if(!v.equals(null)) {
-            while (!recipe.getNom().substring(0, 1).equals(v.getTag()) && i < getListView().getCount()) {
-
-                i = i + 1;
-                recipe = MainActivity.recetteDao.queryBuilder()
-                        .where(RecetteDao.Properties.Id.eq(getListAdapter().getItemId(i)))
-                        .unique();
-            }
-        }
-
-        if (i>=getListView().getCount()){
-
-            Toast toast = Toast.makeText(getApplicationContext(), "Desole, \nPas de recette pour cette lettre", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        else{
-            getListView().setSelection(i);}
+    while ( !listRecipes.get(i).getNom().substring(0, 1).equalsIgnoreCase(v.getTag().toString()) && i < listRecipes.size()-1) {
+        i = i + 1;
     }
 
+        if(listRecipes.get(listRecipes.size()-1).getNom().substring(0, 1).equalsIgnoreCase(v.getTag().toString())){
+            getListView().setSelection(i);
+        }
+            else {
 
-    @Override
-		protected void onStop() {
-			// TODO Auto-generated method stub
-			cursor.close();
-			super.onStop();
-		}
+                if (i < listRecipes.size() - 1) {
+                    getListView().setSelection(i);
 
+                }
+
+                else{
+                    final Toast toast = Toast.makeText(getApplicationContext(), "Aucune recette pour cette lettre", Toast.LENGTH_SHORT);
+                    toast.show();
+
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            toast.cancel();
+                        }
+                    }, 500);
+
+                }
+            }
+
+    }
 
 }
