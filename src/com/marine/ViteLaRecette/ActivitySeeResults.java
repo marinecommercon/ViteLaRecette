@@ -54,8 +54,6 @@ public class ActivitySeeResults extends ListActivity {
         }
 
         else {
-
-            getListView().setVisibility(View.INVISIBLE);
             initAdapter();
             fulfilSpinnerChangeOrder();
         }
@@ -155,22 +153,29 @@ public class ActivitySeeResults extends ListActivity {
                 switch (position) {
 
                     case 0:
-                        putInOrder('I');
+                        getScore('T');
                         break;
 
                     case 1:
-                        putInOrder('D');
+                        getScore('D');
                         break;
 
                     case 2:
-                        putInOrder('P');
+                        getScore('P');
                         break;
 
                     default:
-                        putInOrder('I');
+                        getScore('T');
                         break;
 
                 }
+
+                Collections.sort(listRecipes, new Comparator<Recette>() {
+                    @Override
+                    public int compare(Recette recipe1, Recette recipe2) {
+                        return recipe1.getScore().compareTo(recipe2.getScore());
+                    }
+                });
 
                 adapter.notifyDataSetChanged();
 
@@ -183,56 +188,15 @@ public class ActivitySeeResults extends ListActivity {
         });
     }
 
-    private void putInOrder(int criterion) {
-
-        int score = 0;
-
-        switch (criterion) {
-
-            //The smallest score will be at the top of the list
-            case 'I':
-                getListView().setVisibility(View.INVISIBLE);
-                for (int i = 0; i < listRecipes.size(); i++) {
-                    score = getScoreIngredient(listRecipes.get(i)) * 100 + listRecipes.get(i).getPreparation() + listRecipes.get(i).getCuisson();
-                    listRecipes.get(i).setScore(score);
-                    getListView().setVisibility(View.VISIBLE);
-                }
-                break;
-
-            case 'D':
-                getListView().setVisibility(View.INVISIBLE);
-                for (int i = 0; i < listRecipes.size(); i++) {
-                    score = listRecipes.get(i).getDifficulte() * 100 + listRecipes.get(i).getPreparation() + listRecipes.get(i).getCuisson();
-                    listRecipes.get(i).setScore(score);
-                    getListView().setVisibility(View.VISIBLE);
-                }
-                break;
-
-            case 'P':
-                getListView().setVisibility(View.INVISIBLE);
-                for (int i = 0; i < listRecipes.size(); i++) {
-                    score = listRecipes.get(i).getPrix() * 100 + listRecipes.get(i).getPreparation() + listRecipes.get(i).getCuisson();
-                    listRecipes.get(i).setScore(score);
-                    getListView().setVisibility(View.VISIBLE);
-                }
-                break;
-        }
-
-                Collections.sort(listRecipes, new Comparator<Recette>() {
-                    @Override
-                    public int compare(Recette recipe1, Recette recipe2) {
-                        return recipe1.getScore().compareTo(recipe2.getScore());
-                    }
-                });
-
-    }
-
-
 
     //Get the score for the matching with ingredients.
-    private int getScoreIngredient(Recette recipe) {
+    private void getScore(int choice) {
 
-        int score = 0;
+        int scoreFinal = 0;
+        int scoreIngredients = 0;
+        int scoreTime = 0;
+        int scoreDifficulty = 0;
+        int scorePrice = 0;
 
         if ((ingredientAId >= 0) || (ingredientBId >= 0) || (ingredientCId >= 0)) {
             listMatchingRecipes = MainActivity.quantiteDao
@@ -240,18 +204,45 @@ public class ActivitySeeResults extends ListActivity {
                     .whereOr(Properties.IngredientId.eq(ingredientAId),
                             Properties.IngredientId.eq(ingredientBId),
                             Properties.IngredientId.eq(ingredientCId)).list();
+        }
 
+        for (int i = 0; i < listRecipes.size(); i++) {
+            scoreIngredients = 0;
 
             for (int j = 0; j < listMatchingRecipes.size(); j++) {
-
-                if (recipe.getId() == listMatchingRecipes.get(j).getRecetteId()) {
-                    score = score + 1;
+                if (listRecipes.get(i).getId() == listMatchingRecipes.get(j).getRecetteId()) {
+                    scoreIngredients = scoreIngredients + 1;
                 }
             }
+
+            scoreTime = listRecipes.get(i).getPreparation() + listRecipes.get(i).getCuisson();
+            scoreDifficulty = listRecipes.get(i).getDifficulte();
+            scorePrice = listRecipes.get(i).getPrix();
+
+            switch (choice) {
+
+                case 'T':
+                    scoreFinal = (3 - scoreIngredients) * 100 + scoreTime;
+                    listRecipes.get(i).setScore(scoreFinal);
+                    break;
+
+                case 'D':
+                    scoreFinal = (3 - scoreIngredients) * 100 + scoreDifficulty;
+                    listRecipes.get(i).setScore(scoreFinal);
+                    break;
+
+                case 'P':
+                    scoreFinal = (3 - scoreIngredients) * 100 + scorePrice;
+                    listRecipes.get(i).setScore(scoreFinal);
+                    break;
+            }
+
+            System.out.println("score " + scoreFinal);
         }
-        score = 3 - score;
-        return score;
+
     }
+
+
 
 
 
