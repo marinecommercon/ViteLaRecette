@@ -64,7 +64,7 @@ public class ActivityShoplist extends Activity implements OnClickListener {
 		info1 = (TextView) findViewById(R.id.info1);
 
 		listeRecettes = new ArrayList<Recette>();
-		listRecettes = (ListView) findViewById(R.id.recettesList);
+		listRecettes = (ListView) findViewById(R.id.favoriteRecipesList);
 		courses = MainActivity.listeDao.loadAll();
 		for (int i = 0; i < courses.size(); i++) {
 			listeRecettes.add(courses.get(i).getRecette());

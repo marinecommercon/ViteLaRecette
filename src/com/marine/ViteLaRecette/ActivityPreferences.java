@@ -11,295 +11,373 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.marine.ViteLaRecette.adapter.AdapterPersonalSearch;
 import com.marine.ViteLaRecette.dao.Categorie;
 import com.marine.ViteLaRecette.dao.Ingredient;
 import com.marine.ViteLaRecette.dao.Recette;
-import com.marine.ViteLaRecette.dao.RecetteDao.Properties;
+import com.marine.ViteLaRecette.dao.RecetteDao;
 
 public class ActivityPreferences extends Activity {
 
-	private Button boutonAjoutCategorieBannie;
-	private ListView listViewRecettes;
-	private List<Recette> listeRecettes;
-	private AdapterPersonalSearch adapter;
-	private ListView listViewRecettesB;
-	private List<Recette> listeRecettesB;
-	private AdapterPersonalSearch adapterB;
-	private ListView listViewIngredients;
-	private List<Ingredient> listeIngredients;
-	private ArrayList<String> listeIngreNoms;
-	private ArrayAdapter<String> adapterI;
-	private ListView listViewCategories;
-	private List<Categorie> listeCategories;
-	private ArrayList<String> listeCateNoms;
-	private ArrayAdapter<String> adapterC;
-	private Spinner spinnerCat;
-	private List<String> listCat;
-	private List<Categorie> listeCat;
-	private ArrayAdapter<String> spinnerCatAdapter;
-	private AlertDialog alert;
+	private Button buttonAddCategory;
 
-	@Override
+    //get_GC
+    private List<Categorie> newList;
+
+    //createSpinner_GC
+    private List<String> listCategoryNames;
+    private Spinner spinnerCategories;
+    private ArrayAdapter<String> spinnerCategoriesAdapter;
+
+    //initListview_BC
+    private ListView listviewBannedCategories;
+    private List<Categorie> listBannedCategoriesItems;
+    private ArrayList<String> listBannedCategories;
+	private ArrayAdapter<String> bannedCategoriesAdapter;
+
+    //initFavoriteRecipes
+    private ListView listviewFavoriteRecipes;
+    private AdapterPersonalSearch favoriteRecipesAdapter;
+    private List<Recette> listFavoriteRecipes;
+
+    //initBannedRecipes
+    private ListView listviewBannedRecipes;
+    private AdapterPersonalSearch bannedRecipesAdapter;
+    private List<Recette> listBannedRecipes;
+
+    //initListview_BI
+    private ListView listviewBannedIngredients;
+    private List<Ingredient> listBannedIngredientsItems;
+    private ArrayList<String> listBannedIngredients;
+    private ArrayAdapter<String> bannedIngredientsAdapter;
+
+    private AlertDialog alert;
+
+
+
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateFavoriteRecipes();
+        updateBannedRecipes();
+    }
+
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_preferences);
 
-		initSpinnerCategorie();
-		
-		initBoutonAjouterCategorie();
-		
-		initListeRecettesFavoris();
-		
-		initListeRecettesBannies();
-		
-		initListeIngredients();
+        buttonAddCategory = (Button) findViewById(R.id.buttonAddCategory);
+        listviewBannedCategories = (ListView) findViewById(R.id.bannedCategoriesList);
+        listviewFavoriteRecipes = (ListView) findViewById(R.id.favoriteRecipesList);
+        listviewBannedRecipes = (ListView) findViewById(R.id.bannedRecipesList);
+        listviewBannedIngredients = (ListView) findViewById(R.id.bannedIngredientsList);
 
-		initListeCategorie();
+        initListview_BC();
+        setOnclick_BC();
+        initButton_GC();
 
+        updateFavoriteRecipes();
+        initFavoriteRecipes();
+
+        updateBannedRecipes();
+        initBannedRecipes();
+
+        initListview_BI();
+        initBannedIngredients();
 	}
 
 
-	private void initBoutonAjouterCategorie(){
-		
-		boutonAjoutCategorieBannie = (Button) findViewById(R.id.boutonAjoutCategorieBannie);
-		boutonAjoutCategorieBannie.setOnClickListener(new OnClickListener() {
+    /******************************************************************************************************************
+     * ****************************************************************************************************************
+     * **********************************************CATEGORIES********************************************************
+     * ****************************************************************************************************************
+     * ****************************************************************************************************************
+     */
 
-			@Override
-			public void onClick(View v) {
 
-				AlertDialog alertDialog = new AlertDialog.Builder(
-						ActivityPreferences.this).create();
-				alertDialog.setMessage("Bannir catégorie : ");
+	private void initButton_GC(){
 
-				alertDialog.setView(spinnerCat);
-				alertDialog.setButton("Retour",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-							}
-						});
-				alertDialog.setButton2("Confirmer",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								Categorie categorie = listeCat.get(spinnerCat
-										.getSelectedItemPosition());
-								categorie.setFavoris(-1);
-								MainActivity.categorieDao.update(categorie);
-								listeCategories.add(categorie);
-								listeCateNoms.add(categorie.getNom());
-								adapterC.notifyDataSetChanged();
-							}
-						});
+		buttonAddCategory.setOnClickListener(new OnClickListener() {
 
-				alertDialog.show();
+            @Override
+            public void onClick(View v) {
 
-			}
-		});
-		
-	}
+                createSpinner_GC(get_GC());
 
-	private void initSpinnerCategorie(){
-		
-		spinnerCat = new Spinner(ActivityPreferences.this);
+                AlertDialog alertDialog = new AlertDialog.Builder(ActivityPreferences.this).create();
+                alertDialog.setMessage("Bannir catégorie : ");
+                alertDialog.setView(spinnerCategories);
 
-		listCat = new ArrayList<String>();
-		listeCat = MainActivity.categorieDao
-				.queryBuilder().list();
-		for (int i = 0; i < listeCat.size(); i++) {
-			listCat.add(listeCat.get(i).getNom());
-		}
-
-		spinnerCatAdapter = new ArrayAdapter<String>(
-				ActivityPreferences.this,
-				android.R.layout.simple_spinner_item, listCat);
-		spinnerCatAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerCat.setAdapter(spinnerCatAdapter);
-		
-	}
-
-	private void initListeRecettesFavoris(){
-		listViewRecettes = (ListView) findViewById(R.id.recettesList);
-		listViewRecettes.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1,
-					final int arg2, long arg3) {
-				alert = new AlertDialog.Builder(
-						ActivityPreferences.this).create();
-				alert.setMessage("Retirer de la liste ?");
-				alert.setButton("Non",
+                alertDialog.setButton("Retour",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                             }
                         });
-				alert.setButton2("Oui",
+
+                alertDialog.setButton2("Confirmer",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                listeRecettes.get(arg2).setFavoris(0);
-                                MainActivity.recetteDao.update(listeRecettes
-                                        .get(arg2));
-                                listeRecettes.remove(arg2);
-                                adapter.notifyDataSetChanged();
+
+                                //Find the selected in the newList (get_GC)
+                                Categorie categorie = get_GC().get(spinnerCategories.getSelectedItemPosition());
+                                categorie.setFavoris(-1);
+                                MainActivity.categorieDao.update(categorie);
+
+                                //The listView of BC will change
+                                initListview_BC();
                             }
                         });
-				alert.setButton3("Detail",
+
+                alertDialog.show();
+
+            }
+        });
+    }
+
+    //Create the spinner
+    private void createSpinner_GC(List<Categorie> listCategoryItems){
+
+        spinnerCategories = new Spinner(ActivityPreferences.this);
+        listCategoryNames = new ArrayList<String>();
+
+        for (int i = 0; i < listCategoryItems.size(); i++) {
+            listCategoryNames.add(listCategoryItems.get(i).getNom());
+        }
+
+
+        spinnerCategoriesAdapter = new ArrayAdapter<String>(ActivityPreferences.this,android.R.layout.simple_spinner_item, listCategoryNames);
+        spinnerCategoriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategories.setAdapter(spinnerCategoriesAdapter);
+
+    }
+
+    //Get categories names from database (<>-1)
+    private List<Categorie> get_GC(){
+
+        //List all banned categories
+        newList = MainActivity.categorieDao.queryBuilder().where(com.marine.ViteLaRecette.dao.CategorieDao.Properties.Favoris.eq(0)).list();
+
+        return newList;
+
+    }
+
+    // Banned categories
+    private void initListview_BC(){
+
+    listBannedCategoriesItems = MainActivity.categorieDao.queryBuilder().where(com.marine.ViteLaRecette.dao.CategorieDao.Properties.Favoris.eq(-1)).list();
+    listBannedCategories = new ArrayList<String>();
+
+        for (int i = 0; i < listBannedCategoriesItems.size(); i++) {
+            listBannedCategories.add(listBannedCategoriesItems.get(i).getNom());
+        }
+
+        bannedCategoriesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listBannedCategories);
+        listviewBannedCategories.setAdapter(bannedCategoriesAdapter);
+    }
+
+    private void setOnclick_BC() {
+
+        listviewBannedCategories.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1,
+                                    final int arg2, long arg3) {
+                AlertDialog alertDialog = new AlertDialog.Builder(ActivityPreferences.this).create();
+                alertDialog.setMessage("Retirer de la liste ?");
+
+                alertDialog.setButton("Non",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                Intent intent1 = new Intent(
-                                        ActivityPreferences.this,
-                                        ActivityDetailRecipe.class);
-                                intent1.putExtra("ID", listeRecettes.get(arg2)
-                                        .getId());
+                            }
+                        });
+
+                alertDialog.setButton2("Oui",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                listBannedCategoriesItems.get(arg2).setFavoris(0);
+                                MainActivity.categorieDao.update(listBannedCategoriesItems.get(arg2));
+
+                                initListview_BC();
+                            }
+                        });
+
+                alertDialog.show();
+            }
+        });
+    }
+
+
+    /******************************************************************************************************************
+     * ****************************************************************************************************************
+     * **********************************************FAVOURITE RECIPES*************************************************
+     * ****************************************************************************************************************
+     * ****************************************************************************************************************
+     */
+
+    private void initFavoriteRecipes(){
+
+        listviewFavoriteRecipes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2, long arg3) {
+
+                alert = new AlertDialog.Builder(ActivityPreferences.this).create();
+                alert.setMessage("Retirer de la liste ?");
+
+                alert.setButton("Non",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        });
+
+                alert.setButton2("Oui",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                listFavoriteRecipes.get(arg2).setFavoris(0);
+                                MainActivity.recetteDao.update(listFavoriteRecipes.get(arg2));
+
+                                updateFavoriteRecipes();
+                            }
+                        });
+
+                alert.setButton3("Detail",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent1 = new Intent(ActivityPreferences.this, ActivityDetailRecipe.class);
+                                intent1.putExtra("ID", listFavoriteRecipes.get(arg2).getId().intValue());
                                 startActivity(intent1);
                             }
                         });
 
-				alert.show();
-			}
-		});
+                alert.show();
+            }
+        });
+    }
 
-		listeRecettes = MainActivity.recetteDao.queryBuilder()
-				.where(Properties.Favoris.eq(1)).list();
 
-		adapter = new AdapterPersonalSearch(this, listeRecettes);
-		listViewRecettes.setAdapter(adapter);
-	}
-	
-	/*
-	 * Initialise, remplit et g�re la suppression des �l�ments de la liste : Recettes bannies.
-	 */
-	private void initListeRecettesBannies(){
-		
-		listViewRecettesB = (ListView) findViewById(R.id.recettesBList);
-		listViewRecettesB.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1,
-					final int arg2, long arg3) {
-				AlertDialog alertDialog = new AlertDialog.Builder(
-						ActivityPreferences.this).create();
-				alertDialog.setMessage("Retirer de la liste ?");
-				alertDialog.setButton("Non",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-							}
-						});
-				alertDialog.setButton2("Oui",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								listeRecettesB.get(arg2).setFavoris(0);
-								MainActivity.recetteDao.update(listeRecettesB
-										.get(arg2));
-								listeRecettesB.remove(arg2);
-								adapterB.notifyDataSetChanged();
-							}
-						});
+    private void updateFavoriteRecipes(){
 
-				alertDialog.show();
-			}
-		});
-		listeRecettesB = MainActivity.recetteDao.queryBuilder()
-				.where(Properties.Favoris.eq(-1)).list();
+        listFavoriteRecipes = MainActivity.recetteDao.queryBuilder().where(RecetteDao.Properties.Favoris.eq(1)).list();
+        favoriteRecipesAdapter = new AdapterPersonalSearch(this, listFavoriteRecipes);
+        listviewFavoriteRecipes.setAdapter(favoriteRecipesAdapter);
 
-		adapterB = new AdapterPersonalSearch(this, listeRecettesB);
-		listViewRecettesB.setAdapter(adapterB);
-		
-	}
-	
+    }
 
-	private void initListeIngredients(){
-		
-		listViewIngredients = (ListView) findViewById(R.id.ingredientsList);
-		listViewIngredients.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1,
-					final int arg2, long arg3) {
-				AlertDialog alertDialog = new AlertDialog.Builder(
-						ActivityPreferences.this).create();
-				alertDialog.setMessage("Retirer de la liste ?");
-				alertDialog.setButton("Non",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-							}
-						});
-				alertDialog.setButton2("Oui",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								listeIngredients.get(arg2).setFavoris(0);
-								MainActivity.ingredientDao
-										.update(listeIngredients.get(arg2));
-								listeIngredients.remove(arg2);
-								listeIngreNoms.remove(arg2);
-								adapterI.notifyDataSetChanged();
-							}
-						});
 
-				alertDialog.show();
-			}
-		});
-		listeIngredients = MainActivity.ingredientDao
-				.queryBuilder()
-				.where(com.marine.ViteLaRecette.dao.IngredientDao.Properties.Favoris
-						.eq(-1)).list();
+    /******************************************************************************************************************
+     * ****************************************************************************************************************
+     * **********************************************BANNED RECIPES****************************************************
+     * ****************************************************************************************************************
+     * ****************************************************************************************************************
+     */
 
-		listeIngreNoms = new ArrayList<String>();
+    private void initBannedRecipes(){
 
-		for (int i = 0; i < listeIngredients.size(); i++) {
-			listeIngreNoms.add(listeIngredients.get(i).getNom());
-		}
+        listviewBannedRecipes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-		adapterI = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-				listeIngreNoms);
-		listViewIngredients.setAdapter(adapterI);
-		
-	}
-	
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2, long arg3) {
 
-	private void initListeCategorie(){
-		listViewCategories = (ListView) findViewById(R.id.categoriesList);
-		listViewCategories.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1,
-					final int arg2, long arg3) {
-				AlertDialog alertDialog = new AlertDialog.Builder(
-						ActivityPreferences.this).create();
-				alertDialog.setMessage("Retirer de la liste ?");
-				alertDialog.setButton("Non",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-							}
-						});
-				alertDialog.setButton2("Oui",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								listeCategories.get(arg2).setFavoris(0);
-								MainActivity.categorieDao
-										.update(listeCategories.get(arg2));
-								listeCategories.remove(arg2);
-								listeCateNoms.remove(arg2);
-								adapterC.notifyDataSetChanged();
-							}
-						});
+                alert = new AlertDialog.Builder(ActivityPreferences.this).create();
+                alert.setMessage("Retirer de la liste ?");
 
-				alertDialog.show();
-			}
-		});
+                alert.setButton("Non",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        });
 
-		listeCategories = MainActivity.categorieDao
-				.queryBuilder()
-				.where(com.marine.ViteLaRecette.dao.CategorieDao.Properties.Favoris
-						.eq(-1)).list();
+                alert.setButton2("Oui",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
 
-		listeCateNoms = new ArrayList<String>();
+                                listBannedRecipes.get(arg2).setFavoris(0);
+                                MainActivity.recetteDao.update(listBannedRecipes.get(arg2));
 
-		for (int i = 0; i < listeCategories.size(); i++) {
-			listeCateNoms.add(listeCategories.get(i).getNom());
-		}
+                                updateBannedRecipes();
+                            }
+                        });
 
-		adapterC = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-				listeCateNoms);
-		listViewCategories.setAdapter(adapterC);
-	}
+                alert.setButton3("Detail",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent1 = new Intent(ActivityPreferences.this, ActivityDetailRecipe.class);
+                                intent1.putExtra("ID", listBannedRecipes.get(arg2).getId().intValue());
+                                startActivity(intent1);
+                            }
+                        });
+
+                alert.show();
+            }
+        });
+    }
+
+    private void updateBannedRecipes(){
+
+        listBannedRecipes = MainActivity.recetteDao.queryBuilder().where(RecetteDao.Properties.Favoris.eq(-1)).list();
+        bannedRecipesAdapter = new AdapterPersonalSearch(this, listBannedRecipes);
+        listviewBannedRecipes.setAdapter(bannedRecipesAdapter);
+
+    }
+
+    /******************************************************************************************************************
+     * ****************************************************************************************************************
+     * **********************************************BANNED INGREDIENTS************************************************
+     * ****************************************************************************************************************
+     * ****************************************************************************************************************
+     */
+
+    private void initBannedIngredients(){
+
+        listviewBannedIngredients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1,
+                                    final int arg2, long arg3) {
+                AlertDialog alertDialog = new AlertDialog.Builder(
+                        ActivityPreferences.this).create();
+                alertDialog.setMessage("Retirer de la liste ?");
+                alertDialog.setButton("Non",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        });
+                alertDialog.setButton2("Oui",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                listBannedIngredientsItems.get(arg2).setFavoris(0);
+                                MainActivity.ingredientDao.update(listBannedIngredientsItems.get(arg2));
+
+                                initListview_BI();
+                            }
+                        });
+
+                alertDialog.show();
+            }
+        });
+
+
+
+    }
+
+    private void initListview_BI(){
+
+        listBannedIngredientsItems = MainActivity.ingredientDao.queryBuilder().where(com.marine.ViteLaRecette.dao.IngredientDao.Properties.Favoris.eq(-1)).list();
+        listBannedIngredients = new ArrayList<String>();
+
+        for (int i = 0; i < listBannedIngredientsItems.size(); i++) {
+            listBannedIngredients.add(listBannedIngredientsItems.get(i).getNom());
+        }
+
+        bannedIngredientsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listBannedIngredients);
+        listviewBannedIngredients.setAdapter(bannedIngredientsAdapter);
+
+    }
 
 }
