@@ -1,261 +1,224 @@
 package com.marine.ViteLaRecette;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageButton;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.marine.ViteLaRecette.adapter.AdapterCourses;
+import com.marine.ViteLaRecette.adapter.AdapterSteps;
 import com.marine.ViteLaRecette.dao.Liste;
 import com.marine.ViteLaRecette.dao.Quantite;
 import com.marine.ViteLaRecette.dao.Recette;
 
 public class ActivityShoplist extends Activity implements OnClickListener {
 
-	private ImageButton boutonBack;
-	private ListView listRecettes;
-	private ArrayList<Recette> listeRecettes;
 
-	private AdapterCourses adapter;
-	private List<Liste> courses;
-	ArrayList<Quantite> quantite;
-	private TextView info1;
-	private int[] listeNbInitial = new int[200];// Tableau de taille NT pour les
-												// diff�rents
-												// "Nombres de personnes" de
-												// chaque recette
-	private int[] listeNbFinal = new int[200];// Tableau de taille NT pour les
-												// diff�rents
-												// "Nombres de personnes" en
-	private String[] QUA = new String[200];// Tableau de taille NT pour les
-											// diff�rentes quantit�s
-	private String[] MES = new String[200];// Tableau de taille NT pour les
-											// diff�rentes mesures
-	private String[] ING = new String[200];// Tableau de taille NT pour les
-											// diff�rents ingr�dients
-	private String[][] data = new String[200][3];// Tableau final contenant
-													// toutes les donn�es utiles
+    //initShoplist
+    private List<Liste> recipesItems;
+    private ArrayList<Recette> listRecipes;
+    private AdapterCourses recipesAdapter;
+
+    //setOnclick_Recipes()
+    private ListView listviewRecipes;
+
+    //getListQuantitiesId
+    ArrayList<Quantite> listQuantities;
+    ArrayList<String> listQuantitiesText;
+
+	private TextView textviewIngredients;
+    private ListView mListView;
+    private ArrayList<String> listDescription;
+    private ArrayList<HashMap<String,Object>> mList = new ArrayList<HashMap<String,Object>>();
+    private SharedPreferences prefs;
+
+    private final String TAG = getClass().getSimpleName().toString();
+
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_shoplist);
+        super.onCreate(savedInstanceState);
 
-		boutonBack = (ImageButton) findViewById(R.id.boutonBack);
-		boutonBack.setOnClickListener(new OnClickListener() {
+        setContentView(R.layout.activity_shoplist);
+        prefs = this.getSharedPreferences(TAG, MODE_PRIVATE);
+        listviewRecipes = (ListView) findViewById(R.id.shoplistRecipes);
+        textviewIngredients = (TextView) findViewById(R.id.textviewIngredients);
 
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});
+        initShoplist();
+        setOnclick_Recipes();
+        getListQuantitiesId();
+        initCheckboxes(this);
 
-		info1 = (TextView) findViewById(R.id.info1);
+    }
 
-		listeRecettes = new ArrayList<Recette>();
-		listRecettes = (ListView) findViewById(R.id.favoriteRecipesList);
-		courses = MainActivity.listeDao.loadAll();
-		for (int i = 0; i < courses.size(); i++) {
-			listeRecettes.add(courses.get(i).getRecette());
-		}
 
-		adapter = new AdapterCourses(this, listeRecettes);
-		listRecettes.setAdapter(adapter);
-		listRecettes.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(final AdapterView<?> arg0, View arg1,
-					final int arg2, final long arg3) {
-				AlertDialog alertDialog = new AlertDialog.Builder(
-						ActivityShoplist.this).create();
-				alertDialog.setMessage("Retirer de la liste ?");
-				alertDialog.setButton("Non",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								// User clicked OK button
-							}
-						});
-				alertDialog.setButton2("Oui",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								// User clicked OK button
-								MainActivity.listeDao.delete(courses.get(arg2));
-								listeRecettes.remove(arg2);
-								courses.remove(arg2);
-								info1.setText("");
-								Recommence();
-								adapter.notifyDataSetChanged();
-							}
-						});
-				alertDialog.setButton3("Detail",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								// User clicked OK button
-								Intent intent1 = new Intent(
-										ActivityShoplist.this,
-										ActivityDetailRecipe.class);
-								intent1.putExtra("ID", listeRecettes.get(arg2)
-										.getId().intValue());
 
-								startActivity(intent1);
+    private void initShoplist(){
 
-							}
-						});
+        recipesItems = MainActivity.listeDao.loadAll();
+        listRecipes = new ArrayList<Recette>();
 
-				alertDialog.show();
-			}
-		});
+        for (int i = 0; i < recipesItems.size(); i++) {
+            listRecipes.add(recipesItems.get(i).getRecette());
+        }
 
-		quantite = new ArrayList<Quantite>();
-		Recommence();
+        recipesAdapter = new AdapterCourses(this, listRecipes);
+        listviewRecipes.setAdapter(recipesAdapter);
 
-	}
+    }
 
-	public void Recommence() {
+    private void setOnclick_Recipes() {
 
-		int compteur = 0;// Compteur permettant cr�er un tableau de taille NT �
-							// partir des nombre de personnes entr�s par
-							// l'utilisateur
-		int quantiteSize = 0;// Compte le nombre de quantit�s par recette
-		int NT = 0;// Le nombre total de quantit�s
-		int nombreFinal = 0;// Variable qui permet de stocker le nombre de
-							// personnes entr�s par l'utilisateur pour une
-							// recette
+        listviewRecipes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-		quantite.clear();
+            @Override
+            public void onItemClick(final AdapterView<?> arg0, View arg1, final int arg2, final long arg3) {
+                AlertDialog alertDialog = new AlertDialog.Builder(
+                        ActivityShoplist.this).create();
 
-		for (int j = 0; j < courses.size(); j++) {
-			quantite.addAll(MainActivity.quantiteDao
-					._queryRecette_QuantDeRec(listeRecettes.get(j).getId()));
-		}
-		NT = quantite.size();
+                alertDialog.setMessage("Retirer de la liste ?");
 
-		// Cr�ation d'un tableau de taille NT (listeNbFinal[]) � partir des
-		// nombre de personnes entr�s par l'utilisateur
-		for (int j = 0; j < courses.size(); j++) {
-			quantiteSize = courses.get(j).getRecette().getQuantDeRec().size();
-			nombreFinal = courses.get(j).getNombre();
+                alertDialog.setButton("Non",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        });
 
-			for (int i = compteur; i < quantiteSize + compteur; i++) {
-				listeNbFinal[i] = nombreFinal;
-				Log.d("test", "1" + listeNbFinal[i]);
-			}
-			compteur = compteur + quantiteSize;
-		}
+                alertDialog.setButton2("Oui", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
 
-		// Remplissage de data[][] avec ajustement des quantit�s
-		for (int i = 0; i < NT; i++) {
+                        MainActivity.listeDao.delete(recipesItems.get(arg2));
+                        initShoplist();
+                    }
+                });
+                alertDialog.setButton3("Detail",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
 
-			listeNbInitial[i] = quantite.get(i).getRecette().getNombre();
-			QUA[i] = ""
-					+ Math.round(quantite.get(i).getQuantite()
-							* listeNbFinal[i] / listeNbInitial[i]);
-			MES[i] = quantite.get(i).getMesure().getNom();
-			ING[i] = quantite.get(i).getIngredient().getNom();
+                                Intent intent1 = new Intent(ActivityShoplist.this, ActivityDetailRecipe.class);
+                                intent1.putExtra("ID", listRecipes.get(arg2).getId().intValue());
+                                startActivity(intent1);
+                            }
+                        });
 
-			if (QUA[i].equals("0")) {
-				QUA[i] = "";
-			}
+                alertDialog.show();
+            }
+        });
+    }
 
-			data[i][1] = ING[i];
-			data[i][0] = QUA[i] + " " + MES[i];
-		}
 
-		// Tri des lignes de data par ordre alphab�tique du nom de l'ingr�dient
-		for (int i = 0; i < NT; i++) {
-			for (int j = 0; j < NT; j++) {
-				if (data[i][1].compareTo(data[j][1]) < 0) {
-					String a = data[j][1];
-					String b = data[j][0];
-					data[j][1] = data[i][1];
-					data[j][0] = data[i][0];
-					data[i][1] = a;
-					data[i][0] = b;
-				}
-			}
-		}
+    private void getListQuantitiesId(){
 
-		// Affichage dans le TextView
-		for (int i = 0; i < NT; i++) {
-			info1.append("" + data[i][0] + " " + data[i][1] + "\n");
-		}
-		
-		
-		
-		
-		
-		
-		
 
-		compteur = 0;// Compteur permettant cr�er un tableau de taille NT �
-		// partir des nombre de personnes entr�s par
-		// l'utilisateur
-		quantiteSize = 0;// Compte le nombre de quantit�s par recette
-		NT = 0;// Le nombre total de quantit�s
-		nombreFinal = 0;// Variable qui permet de stocker le nombre de
-		// personnes entr�s par l'utilisateur pour une
-		// recette
+        listQuantities = new ArrayList<Quantite>();
+        listQuantitiesText = new ArrayList<String>();
+        listDescription = new ArrayList<String>();
 
-		
-		/*
-		quantite.clear();
-		quantites = new ArrayList<String>();
+        int numberOfQuantities = 0;
+        int numberOfPeopleDefault = 0;
+        int numberOfPeopleChosen = 0;
+        String calculatedQuantity = "";
+        String suffix = "";
 
-		for (int j = 0; j < courses.size(); j++) {
-			quantite.addAll(MainActivity.quantiteDao
-					._queryRecette_QuantDeRec(listeRecettes.get(j).getId()));
-		}
-		NT = quantite.size();
-		
-		for(int i = 0; i < NT; i++){
-			
-			quantite.get(i).setQuantite(quantite.get(i).getQuantite()*MainActivity.listeDao.queryBuilder()
-					.where(fr.hei.iti4.cookeasy.dao.ListeDao.Properties.RecetteId.eq(quantite.get(i).getRecetteId()))
-					.unique().getNombre());
-			
-		}
-		
-		int place;
-		Quantite quantiteUn;
-		
-		for(int i = 0; i < NT; i++){
-			place=i;
-			for(int j = i; j < NT; j++){
-				if(quantite.get(i).getIngredient().getNom().charAt(0) > quantite.get(j).getIngredient().getNom().charAt(0)){
-					place = j;
-				}
-			}
-			quantiteUn = quantite.get(i);
-			quantite.set(i, quantite.get(place));
-			quantite.set(place, quantiteUn);
-			
-			quantites.add(""+quantite.get(i).getQuantite()+quantite.get(i).getMesure().getNom()+quantite.get(i).getSuffixe()+quantite.get(i).getIngredient().getNom());
-			
-			adapterQ = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-					quantites);
-			
-			ListView listViewQuantite = (ListView)findViewById(R.id.quantitesList);
-			
-			listViewQuantite.setAdapter(adapterQ);
-			
-		}
-		*/
-		
-		
-		
-		
-		
-	}
+        int count = 0;
+
+        for(int i=0; i<recipesItems.size() ; i++){
+            listQuantities.addAll(MainActivity.quantiteDao._queryRecette_QuantDeRec(listRecipes.get(i).getId()));
+        }
+
+        for( int i=0; i<recipesItems.size() ; i++ ) {
+
+            numberOfQuantities = recipesItems.get(i).getRecette().getQuantDeRec().size();
+            numberOfPeopleDefault = recipesItems.get(i).getRecette().getNombre();
+            numberOfPeopleChosen = recipesItems.get(i).getNombre();
+
+            for (int j = 0; j < numberOfQuantities; j++) {
+
+                calculatedQuantity = Integer.toString((int) Math.ceil((numberOfPeopleChosen * listQuantities.get(count).getQuantite())/numberOfPeopleDefault));
+                suffix = "" + listQuantities.get(count).getSuffixe();
+
+                if (listQuantities.get(count).getQuantite() == 0.0) {
+                    calculatedQuantity = "";
+                }
+                if (suffix.trim().equals("null")) {
+                    suffix = "";
+                }
+
+                listDescription.add("" + calculatedQuantity + " " +
+                        listQuantities.get(count).getMesure().getNom() + " " +
+                        listQuantities.get(count).getIngredient().getNom() + " " +
+                        suffix);
+
+
+
+                count = count + 1;
+            }
+
+
+
+
+
+        }
+
+        System.out.println("" + Math.abs(listDescription.hashCode()) );
+
+
+    }
+
+
+
+    private void initCheckboxes(Activity a) {
+
+        mListView = (ListView) a.findViewById(R.id.listViewDescriptionItemsID);
+
+        for (int i = 0; i < listDescription.size(); i++) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put(AdapterSteps.KEY_LIST_TITLE, listDescription.get(i).toString().trim());
+            map.put(AdapterSteps.KEY_LIST_CHECK, prefs.getBoolean("" + Math.abs(listDescription.hashCode()) + i, false));
+            mList.add(map);
+        }
+
+        String[] from = new String[]{AdapterSteps.KEY_LIST_TITLE, AdapterSteps.KEY_LIST_CHECK};
+        int[] to = new int[]{R.id.listName, R.id.listCheck};
+
+        mListView.setAdapter(
+                new AdapterSteps(this, mList, R.layout.list_itemcheck, from, to)
+        );
+    }
+
+
+    public void MyHandler(View v) {
+        CheckBox cb = (CheckBox) v;
+        int position = Integer.parseInt(cb.getTag().toString());
+
+
+        View o = mListView.getChildAt(position).findViewById(R.id.listCheck);
+
+        if (cb.isChecked()) {
+            SharedPreferences.Editor e = prefs.edit();
+            e.putBoolean("" + Math.abs(listDescription.hashCode()) + position, true);
+            e.commit();
+        } else {
+            SharedPreferences.Editor e = prefs.edit();
+            e.putBoolean("" + Math.abs(listDescription.hashCode()) + position, false);
+            e.commit();
+        }
+    }
+
+
 
 
 	@Override

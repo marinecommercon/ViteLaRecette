@@ -73,7 +73,7 @@ public class ActivityPreferences extends Activity {
 
         buttonAddCategory = (Button) findViewById(R.id.buttonAddCategory);
         listviewBannedCategories = (ListView) findViewById(R.id.bannedCategoriesList);
-        listviewFavoriteRecipes = (ListView) findViewById(R.id.favoriteRecipesList);
+        listviewFavoriteRecipes = (ListView) findViewById(R.id.shoplistRecipes);
         listviewBannedRecipes = (ListView) findViewById(R.id.bannedRecipesList);
         listviewBannedIngredients = (ListView) findViewById(R.id.bannedIngredientsList);
 
@@ -304,7 +304,7 @@ public class ActivityPreferences extends Activity {
                             }
                         });
 
-                alert.setButton3("Detail",
+                alert.setButton3("Détail",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent intent1 = new Intent(ActivityPreferences.this, ActivityDetailRecipe.class);

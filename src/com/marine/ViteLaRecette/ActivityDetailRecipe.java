@@ -136,6 +136,7 @@ public class ActivityDetailRecipe extends Activity {
                 if (numberString.equals("") || numberString.equals("0") || numberInt <= 0 || FirstNumberInt == 0) {
                     alertDialogWrongNumber.show();
                     numberChoosenByUser.getText().clear();
+
                 } else {
                     quantities.clear();
                     for (int i = 0; i < listOfIngredientsSize; i++) {
@@ -175,13 +176,16 @@ public class ActivityDetailRecipe extends Activity {
                 if (numberString.equals("") || numberString.equals("0") || numberInt <= 0 || FirstNumberInt == 0) {
                     alertDialogWrongNumber.show();
                     numberChoosenByUser.getText().clear();
-                } else {
+                }
+                 else {
                     quantities.clear();
+
                     for (int i = 0; i < listOfIngredientsSize; i++) {
-                        double ajustedQuantity = Math.floor(((double) (listOfIngredients.get(i).getQuantite() * numberInt / listOfIngredients.get(i).getRecette().getNombre()) * 10)) / 10;
-                        String Q = "" + ajustedQuantity;
+
+                        double adjustedQuantity = Math.floor(((double) (listOfIngredients.get(i).getQuantite() * numberInt / listOfIngredients.get(i).getRecette().getNombre()) * 10)) / 10;
+                        String Q = "" + adjustedQuantity;
                         String S = "" + listOfIngredients.get(i).getSuffixe();
-                        if (ajustedQuantity == 0.0) {
+                        if (adjustedQuantity == 0.0) {
                             Q = "";
                         }
                         if (S.trim().equals("null")) {
