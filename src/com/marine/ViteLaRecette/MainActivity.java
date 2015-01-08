@@ -1,6 +1,10 @@
 package com.marine.ViteLaRecette;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.widget.Button;
+import android.widget.Toast;
 import com.marine.ViteLaRecette.dao.CategorieDao;
 import com.marine.ViteLaRecette.dao.DaoMaster;
 import com.marine.ViteLaRecette.dao.DaoSession;
@@ -19,7 +23,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -43,6 +48,8 @@ public class MainActivity extends Activity implements OnClickListener {
     private Button buttonShoplist;
     private Button buttonAddRecipe;
 	private Intent intent;
+
+    private int check=0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -135,5 +142,33 @@ public class MainActivity extends Activity implements OnClickListener {
 		db.close();
 		super.onDestroy();
 	}
+
+
+
+    @Override
+    public void onBackPressed() {
+
+        check = check + 1;
+
+        if (check == 1) {
+            Toast toast = Toast.makeText(getApplicationContext(), "Pour quitter, appuyer à nouveau sur le bouton retour", Toast.LENGTH_SHORT);
+            toast.show();
+
+            Timer myTimer;
+            myTimer = new Timer();
+            myTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    check = 0;
+                }
+            }, 2000);
+        }
+
+        if(check==2){
+            finish();
+        }
+    }
+
+
 
 }
