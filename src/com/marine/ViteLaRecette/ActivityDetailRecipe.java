@@ -6,11 +6,13 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -92,8 +94,16 @@ public class ActivityDetailRecipe extends Activity {
         //Handel errors
 
         final AlertDialog alertDialogWrongNumber = new AlertDialog.Builder(ActivityDetailRecipe.this).create();
-        alertDialogWrongNumber.setMessage("Le nombre entre n'est pas correct");
+        alertDialogWrongNumber.setMessage("Le nombre entré n'est pas correct");
         alertDialogWrongNumber.setButton(DialogInterface.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                return;
+            }
+        });
+
+        final AlertDialog alertDialogTooMany = new AlertDialog.Builder(ActivityDetailRecipe.this).create();
+        alertDialogTooMany.setMessage("Le nombre entré est trop grand");
+        alertDialogTooMany.setButton(DialogInterface.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 return;
             }
@@ -125,19 +135,18 @@ public class ActivityDetailRecipe extends Activity {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 String numberString = numberChoosenByUser.getText().toString().trim();
-                int numberInt = Integer.parseInt(numberString);
-                int FirstNumberInt = -1;
 
-                if (numberString.length() > 0) {
-                    String firstNumberString = numberChoosenByUser.getText().toString().trim().substring(0, 1);
-                    FirstNumberInt = Integer.parseInt(firstNumberString);
-                }
-
-                if (numberString.equals("") || numberString.equals("0") || numberInt <= 0 || FirstNumberInt == 0) {
+                if (numberString.equals("") || numberString.equals("0") || numberString.substring(0, 1).equals("0")) {
                     alertDialogWrongNumber.show();
                     numberChoosenByUser.getText().clear();
+                }
+                else if( Integer.parseInt(numberString) > 9999 ){
+                    alertDialogTooMany.show();
+                    numberChoosenByUser.getText().clear();}
 
-                } else {
+                else {
+
+                    int numberInt = Integer.parseInt(numberString);
                     quantities.clear();
                     for (int i = 0; i < listOfIngredientsSize; i++) {
                         double quantityModified = Math.floor(((double) (listOfIngredients.get(i).getQuantite() * numberInt / listOfIngredients.get(i).getRecette().getNombre()) * 10)) / 10;
@@ -165,19 +174,18 @@ public class ActivityDetailRecipe extends Activity {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 String numberString = numberChoosenByUser.getText().toString().trim();
-                int numberInt = Integer.parseInt(numberString);
-                int FirstNumberInt = -1;
 
-                if (numberString.length() > 0) {
-                    String firstNumberString = numberChoosenByUser.getText().toString().trim().substring(0, 1);
-                    FirstNumberInt = Integer.parseInt(firstNumberString);
-                }
-
-                if (numberString.equals("") || numberString.equals("0") || numberInt <= 0 || FirstNumberInt == 0) {
+                if (numberString.equals("") || numberString.equals("0") || numberString.substring(0, 1).equals("0")) {
                     alertDialogWrongNumber.show();
                     numberChoosenByUser.getText().clear();
                 }
-                 else {
+                 else if( Integer.parseInt(numberString) > 9999 ){
+                    alertDialogTooMany.show();
+                    numberChoosenByUser.getText().clear();}
+
+                else {
+
+                    int numberInt = Integer.parseInt(numberString);
                     quantities.clear();
 
                     for (int i = 0; i < listOfIngredientsSize; i++) {
@@ -197,6 +205,8 @@ public class ActivityDetailRecipe extends Activity {
                          }
                     Liste liste = new Liste(null, numberInt, recipe.getId());
                     MainActivity.listeDao.insert(liste);
+
+                    showToast();
 
                 }
                 return;
@@ -344,6 +354,19 @@ public class ActivityDetailRecipe extends Activity {
         ViewGroup.LayoutParams params = listViewIngredients.getLayoutParams();
         params.height = totalHeight + (listViewIngredients.getDividerHeight() * (adapterListviewIngredients.getCount() - 1));
         listViewIngredients.setLayoutParams(params);
+
+    }
+
+    private void showToast(){
+
+        Context context = getApplicationContext();
+
+        CharSequence text = "La recette a été ajoutée à la liste de courses";
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.setGravity(Gravity.CENTER| Gravity.CENTER, 0, 0);
+
+        toast.show();
 
     }
 
