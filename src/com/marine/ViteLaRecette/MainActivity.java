@@ -2,7 +2,9 @@ package com.marine.ViteLaRecette;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.view.Gravity;
 import android.widget.Button;
 import android.widget.Toast;
 import com.marine.ViteLaRecette.dao.CategorieDao;
@@ -49,7 +51,8 @@ public class MainActivity extends Activity implements OnClickListener {
     private Button buttonAddRecipe;
 	private Intent intent;
 
-    private int check=0;
+    private int check;
+    private Timer myTimer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +141,6 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
-		
 		db.close();
 		super.onDestroy();
 	}
@@ -151,10 +153,8 @@ public class MainActivity extends Activity implements OnClickListener {
         check = check + 1;
 
         if (check == 1) {
-            Toast toast = Toast.makeText(getApplicationContext(), "Pour quitter, appuyer à nouveau sur le bouton retour", Toast.LENGTH_SHORT);
-            toast.show();
 
-            Timer myTimer;
+            showToast();
             myTimer = new Timer();
             myTimer.schedule(new TimerTask() {
                 @Override
@@ -167,6 +167,20 @@ public class MainActivity extends Activity implements OnClickListener {
         if(check==2){
             finish();
         }
+    }
+
+
+    private void showToast(){
+
+        Context context = getApplicationContext();
+
+        CharSequence text = "Pour quitter,\nappuyez à nouveau sur le bouton retour";
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.setGravity(Gravity.CENTER| Gravity.CENTER, 0, 0);
+
+        toast.show();
+
     }
 
 
