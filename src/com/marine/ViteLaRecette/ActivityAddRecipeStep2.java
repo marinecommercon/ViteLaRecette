@@ -73,9 +73,14 @@ public class ActivityAddRecipeStep2 extends Activity {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ActivityAddRecipeStep2.this,ActivityAddRecipeStep3.class);
-                addPreferences();
-                startActivity(intent);
+
+                if(dbListIngredients.size()==0){
+                alertIngredientMissing();}else {
+
+                    Intent intent = new Intent(ActivityAddRecipeStep2.this, ActivityAddRecipeStep3.class);
+                    addPreferences();
+                    startActivity(intent);
+                }
             }
         });
 

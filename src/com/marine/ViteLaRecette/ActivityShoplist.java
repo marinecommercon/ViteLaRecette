@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,20 +14,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 import com.marine.ViteLaRecette.adapter.AdapterCourses;
 import com.marine.ViteLaRecette.adapter.AdapterSteps;
+import com.marine.ViteLaRecette.adapter.Model;
 import com.marine.ViteLaRecette.dao.Liste;
 import com.marine.ViteLaRecette.dao.Quantite;
 import com.marine.ViteLaRecette.dao.Recette;
+import com.marine.ViteLaRecette.dao.RecetteDao;
 
-public class ActivityShoplist extends Activity implements OnClickListener {
+public class ActivityShoplist extends Activity implements AdapterView.OnItemClickListener {
 
 
     //initShoplist
+
+
     private List<Liste> recipesItems;
     private ArrayList<Recette> listRecipes;
     private AdapterCourses recipesAdapter;
@@ -46,22 +48,60 @@ public class ActivityShoplist extends Activity implements OnClickListener {
 
     private final String TAG = getClass().getSimpleName().toString();
 
+    ArrayAdapter<Model> adapter;
+    ArrayList<Model> list = new ArrayList<Model>();
 
 
-	@Override
+
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_shoplist);
-        prefs = this.getSharedPreferences(TAG, MODE_PRIVATE);
+
         listviewRecipes = (ListView) findViewById(R.id.shoplistRecipes);
-        textviewIngredients = (TextView) findViewById(R.id.textviewIngredients);
+        mListView = (ListView) findViewById(R.id.shoplistlistViewDescriptionItemsID);
+
+        prefs = this.getSharedPreferences(TAG, MODE_PRIVATE);
+
 
         initShoplist();
         setOnclick_Recipes();
         getListQuantitiesId();
-        initCheckboxes(this);
+        initListDescription(this);
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        for (int i = 0 ; i < list.size() ; i++){
+
+            SharedPreferences.Editor e = prefs.edit();
+
+            if(list.get(i).isSelected()==true){
+                e.putBoolean("" + listDescription.hashCode() + i, true);
+            }else{
+                e.putBoolean("" + listDescription.hashCode() + i, false);
+            }
+            e.commit();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        for (int i = 0 ; i < list.size() ; i++){
+
+            if(prefs.getBoolean("" + listDescription.hashCode() + i, false)==true){
+                list.get(i).setSelected(true);
+            }
+            if(prefs.getBoolean("" + listDescription.hashCode() + i, false)==false){
+                list.get(i).setSelected(false);
+            }
+        }
     }
 
 
@@ -100,8 +140,17 @@ public class ActivityShoplist extends Activity implements OnClickListener {
                 alertDialog.setButton2("Oui", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
+
+                        list.clear();
+                        listDescription.clear();
                         MainActivity.listeDao.delete(recipesItems.get(arg2));
                         initShoplist();
+                        getListQuantitiesId();
+                        initListDescription(ActivityShoplist.this);
+                        listviewRecipes.invalidate();
+                        adapter.notifyDataSetChanged();
+
+
                     }
                 });
                 alertDialog.setButton3("Detail",
@@ -121,7 +170,6 @@ public class ActivityShoplist extends Activity implements OnClickListener {
 
 
     private void getListQuantitiesId(){
-
 
         listQuantities = new ArrayList<Quantite>();
         listQuantitiesText = new ArrayList<String>();
@@ -161,70 +209,41 @@ public class ActivityShoplist extends Activity implements OnClickListener {
                         listQuantities.get(count).getMesure().getNom() + " " +
                         listQuantities.get(count).getIngredient().getNom() + " " +
                         suffix);
-
-
-
                 count = count + 1;
             }
-
-
-
-
-
         }
+    }
 
-        System.out.println("" + Math.abs(listDescription.hashCode()) );
+    protected void initListDescription(Activity a) {
 
-
+        adapter = new AdapterSteps(this,getModel(listDescription));
+        mListView.setAdapter(adapter);
+        mListView.setOnItemClickListener(this);
     }
 
 
+    private List<Model> getModel(ArrayList<String> description) {
 
-    private void initCheckboxes(Activity a) {
-
-        mListView = (ListView) a.findViewById(R.id.listViewDescriptionItemsID);
-
-        for (int i = 0; i < listDescription.size(); i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
-            map.put(AdapterSteps.KEY_LIST_TITLE, listDescription.get(i).toString().trim());
-            map.put(AdapterSteps.KEY_LIST_CHECK, prefs.getBoolean("" + Math.abs(listDescription.hashCode()) + i, false));
-            mList.add(map);
+        for (int i = 0 ; i < description.size() ; i++){
+            list.add(new Model(""+description.get(i)));
         }
-
-        String[] from = new String[]{AdapterSteps.KEY_LIST_TITLE, AdapterSteps.KEY_LIST_CHECK};
-        int[] to = new int[]{R.id.listName, R.id.listCheck};
-
-        mListView.setAdapter(
-                new AdapterSteps(this, mList, R.layout.list_itemcheck, from, to)
-        );
-    }
-
-
-    public void MyHandler(View v) {
-        CheckBox cb = (CheckBox) v;
-        int position = Integer.parseInt(cb.getTag().toString());
-
-
-        View o = mListView.getChildAt(position).findViewById(R.id.listCheck);
-
-        if (cb.isChecked()) {
-            SharedPreferences.Editor e = prefs.edit();
-            e.putBoolean("" + Math.abs(listDescription.hashCode()) + position, true);
-            e.commit();
-        } else {
-            SharedPreferences.Editor e = prefs.edit();
-            e.putBoolean("" + Math.abs(listDescription.hashCode()) + position, false);
-            e.commit();
-        }
+        return list;
     }
 
 
 
 
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+        CheckBox checkbox = (CheckBox) v.getTag(R.id.listCheck);
+        int getPosition = (Integer) checkbox.getTag();
 
-	}
+        if(list.get(getPosition).isSelected()==true){
+            checkbox.setChecked(false);
+        }else{
+            checkbox.setChecked(true);
+        }
+    }
+
 
 }

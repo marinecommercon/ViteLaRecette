@@ -2,16 +2,19 @@ package com.marine.ViteLaRecette;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 import com.marine.ViteLaRecette.adapter.AdapterSteps;
+import com.marine.ViteLaRecette.adapter.Model;
 import com.marine.ViteLaRecette.dao.Recette;
 import com.marine.ViteLaRecette.dao.RecetteDao.Properties;
 
-public class ActivityDetailRecipeSteps extends Activity{
+public class ActivityDetailRecipeSteps extends Activity implements AdapterView.OnItemClickListener {
 
     private Recette recipe;
     private final String TAG = getClass().getSimpleName().toString();
@@ -21,33 +24,97 @@ public class ActivityDetailRecipeSteps extends Activity{
     private  ArrayList <String> listDescription;
     private ListView mListView;
 
+    ArrayAdapter<Model> adapter;
+    ArrayList<Model> list = new ArrayList<Model>();
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_detail_recipe_steps);
+        mListView = (ListView) findViewById(R.id.detailListViewDescriptionItemsID);
         prefs = this.getSharedPreferences(TAG, MODE_PRIVATE);
-        initUI(this);
+
+        initListDescription(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        for (int i = 0 ; i < list.size() ; i++){
+
+            SharedPreferences.Editor e = prefs.edit();
+
+            if(list.get(i).isSelected()==true){
+                e.putBoolean("" + recetteID + i, true);
+            }else{
+                e.putBoolean("" + recetteID + i, false);
+            }
+            e.commit();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        for (int i = 0 ; i < list.size() ; i++){
+
+            if(prefs.getBoolean("" + recetteID + i, false)==true){
+                list.get(i).setSelected(true);
+            }
+            if(prefs.getBoolean("" + recetteID + i, false)==false){
+                list.get(i).setSelected(false);
+            }
+        }
     }
 
 
-    protected void initUI(Activity a) {
+
+    protected void initListDescription(Activity a) {
+
         recetteID = this.getIntent().getIntExtra("ID", 0);
-        recipe = MainActivity.recetteDao.queryBuilder()
-                .where(Properties.Id.eq(recetteID))
-                .unique();
+        recipe = MainActivity.recetteDao.queryBuilder().where(Properties.Id.eq(recetteID)).unique();
 
-
-        //Initialization
         parserDescription((String) recipe.getDescription().toString().trim());
-        initCheckboxes(this);
+
+        adapter = new AdapterSteps(this,getModel(listDescription));
+        mListView.setAdapter(adapter);
+        mListView.setOnItemClickListener(this);
     }
 
+
+     @Override
+     public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
+
+        CheckBox checkbox = (CheckBox) v.getTag(R.id.listCheck);
+        int getPosition = (Integer) checkbox.getTag();
+
+         if(list.get(getPosition).isSelected()==true){
+             checkbox.setChecked(false);
+         }else{
+             checkbox.setChecked(true);
+         }
+    }
+
+
+
+    private List<Model> getModel(ArrayList<String> description) {
+
+        for (int i = 0 ; i < description.size() ; i++){
+            list.add(new Model(""+description.get(i)));
+        }
+        return list;
+    }
 
     private void parserDescription(String description){
 
-        String itemDescription;
         listDescription = new ArrayList<String>();
+        String itemDescription;
         int cursorDescription = 0;
 
         while (description.length()>0){
@@ -70,10 +137,8 @@ public class ActivityDetailRecipeSteps extends Activity{
                 else {
                     cursorDescription = cursorDescription + 1;
                 }
-
             }
             else{
-
                 itemDescription = description.substring(0, cursorDescription);
                 listDescription.add(itemDescription);
                 description="";
@@ -82,47 +147,7 @@ public class ActivityDetailRecipeSteps extends Activity{
 
         for(int i=0 ; i<listDescription.size() ; i++){
             listDescription.remove(".");
-
-        }
-
-    }
-
-    private void initCheckboxes(Activity a) {
-
-        mListView = (ListView) a.findViewById(R.id.listViewDescriptionItemsID);
-
-        for (int i = 0; i < listDescription.size(); i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
-            map.put(AdapterSteps.KEY_LIST_TITLE, listDescription.get(i).toString().trim());
-            map.put(AdapterSteps.KEY_LIST_CHECK, prefs.getBoolean("" + recetteID + i, false));
-            mList.add(map);
-        }
-
-        String[] from = new String[]{AdapterSteps.KEY_LIST_TITLE, AdapterSteps.KEY_LIST_CHECK};
-        int[] to = new int[]{R.id.listName, R.id.listCheck};
-
-        mListView.setAdapter(
-                new AdapterSteps(this, mList, R.layout.list_itemcheck, from, to)
-        );
-    }
-
-
-    public void MyHandler(View v) {
-        CheckBox cb = (CheckBox) v;
-        int position = Integer.parseInt(cb.getTag().toString());
-
-
-        View o = mListView.getChildAt(position).findViewById(
-                R.id.listCheck);
-
-        if (cb.isChecked()) {
-            SharedPreferences.Editor e = prefs.edit();
-            e.putBoolean("" + recetteID + position, true);
-            e.commit();
-        } else {
-            SharedPreferences.Editor e = prefs.edit();
-            e.putBoolean("" + recetteID + position, false);
-            e.commit();
         }
     }
+
 }
