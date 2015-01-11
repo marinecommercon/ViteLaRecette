@@ -1,40 +1,44 @@
 package com.marine.ViteLaRecette;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.view.Gravity;
-import android.widget.Button;
-import android.widget.Toast;
-import com.marine.ViteLaRecette.dao.CategorieDao;
-import com.marine.ViteLaRecette.dao.DaoMaster;
-import com.marine.ViteLaRecette.dao.DaoSession;
-import com.marine.ViteLaRecette.dao.IngredientDao;
-import com.marine.ViteLaRecette.dao.ListeDao;
-import com.marine.ViteLaRecette.dao.MesureDao;
-import com.marine.ViteLaRecette.dao.QuantiteDao;
-import com.marine.ViteLaRecette.dao.RecetteDao;
-import com.marine.ViteLaRecette.dao.DaoMaster.DevOpenHelper;
-import com.marine.ViteLaRecette.database.*;
-
-import android.os.Bundle;
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.view.View;
-import android.view.View.OnClickListener;
+import android.os.Bundle;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.SearchManager;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Handler;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.view.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+import com.marine.ViteLaRecette.dao.*;
+import com.marine.ViteLaRecette.database.MyDatabase;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Created by Marine on 11/01/2015.
+ */
+public class MainActivity extends Activity {
 
-public class MainActivity extends Activity implements OnClickListener {
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+    private String[] mMenuTitles;
 
     private MyDatabase dbImp;
-
     static SQLiteDatabase db;
-
     private DaoMaster daoMaster;
     static DaoSession daoSession;
     static RecetteDao recetteDao;
@@ -43,46 +47,54 @@ public class MainActivity extends Activity implements OnClickListener {
     static CategorieDao categorieDao;
     static ListeDao listeDao;
     static MesureDao mesureDao;
-
-    private Button buttonPersonalSearch;
-    private Button buttonAllRecipes;
-    private Button buttonPreferences;
-    private Button buttonShoplist;
-    private Button buttonAddRecipe;
-    private Intent intent;
-
     private int check;
     private Timer myTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_newmain);
+
+        mTitle = mDrawerTitle = getTitle();
+        mMenuTitles = getResources().getStringArray(R.array.menu_array);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,R.layout.drawer_list_item, mMenuTitles));
+
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
 
 
-        buttonPersonalSearch = (Button) findViewById(R.id.buttonPersonalSearchID);
-        buttonPersonalSearch.setOnClickListener(this);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 
-        buttonAllRecipes = (Button) findViewById(R.id.buttonAllRecipesID);
-        buttonAllRecipes.setOnClickListener(this);
+            public void onDrawerClosed(View view) {
+                getActionBar().setTitle(mTitle);
+                invalidateOptionsMenu();
+            }
 
-        buttonPreferences = (Button) findViewById(R.id.buttonPreferencesID);
-        buttonPreferences.setOnClickListener(this);
+            public void onDrawerOpened(View drawerView) {
+                getActionBar().setTitle(mDrawerTitle);
+                invalidateOptionsMenu();
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        buttonShoplist = (Button) findViewById(R.id.buttonShoplistID);
-        buttonShoplist.setOnClickListener(this);
+        if (savedInstanceState == null) {
+            selectItem(0);
+        }
 
-        buttonAddRecipe = (Button) findViewById(R.id.buttonAddRecipeID);
-        buttonAddRecipe.setOnClickListener(this);
+
 
         importBdd();
 
-        DevOpenHelper helper = new DevOpenHelper(this, "cookeasybdd",
-                null);
-
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "cookeasybdd", null);
         db = helper.getWritableDatabase();
 
-        //Initialisation des Daos
+        //init Daos
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         recetteDao = MainActivity.daoSession.getRecetteDao();
@@ -92,8 +104,9 @@ public class MainActivity extends Activity implements OnClickListener {
         listeDao = MainActivity.daoSession.getListeDao();
         mesureDao = MainActivity.daoSession.getMesureDao();
 
-    }
 
+
+    }
 
     private void importBdd(){
         dbImp = new MyDatabase(this);
@@ -101,41 +114,91 @@ public class MainActivity extends Activity implements OnClickListener {
         dbImp.close();
     }
 
-    @Override
-    public void onClick(View v) {
+    private void showToast(){
 
-        switch (v.getId()) {
+        Context context = getApplicationContext();
 
-            case R.id.buttonPersonalSearchID:
-                intent = new Intent(MainActivity.this, ActivityPersonalSearch.class);
-                startActivity(intent);
+        CharSequence text = "Pour quitter,\nappuyez à nouveau sur le bouton retour";
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.setGravity(Gravity.CENTER| Gravity.CENTER, 0, 0);
+
+        toast.show();
+
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+            mDrawerLayout.closeDrawer(mDrawerList);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    selectItem(position);
+                }
+            }, 300);
+        }
+    }
+
+    private void selectItem(int position) {
+
+        Fragment fragment;
+        FragmentManager fragmentManager;
+        Bundle args = new Bundle();
+
+        switch (position) {
+
+            case 0:
+                fragment = new PersonnalSearchFragment();
+                args.putInt(AllRecipesFragment.MENU_POSITION, position);
+                fragment.setArguments(args);
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
                 break;
 
-            case R.id.buttonAllRecipesID:
-                intent = new Intent(MainActivity.this, ActivityAllRecipes.class);
-                startActivity(intent);
+            case 1:
+                fragment = new AllRecipesFragment();
+                args.putInt(AllRecipesFragment.MENU_POSITION, position);
+                fragment.setArguments(args);
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
                 break;
 
-            case R.id.buttonPreferencesID:
-                intent = new Intent(MainActivity.this, ActivityPreferences.class);
-                startActivity(intent);
+            case 2:
                 break;
 
-            case R.id.buttonShoplistID:
-                intent = new Intent(MainActivity.this, ActivityShoplist.class);
-                startActivity(intent);
+            case 3:
                 break;
 
-            case R.id.buttonAddRecipeID:
-                intent = new Intent(MainActivity.this, ActivityAddRecipeStep1.class);
-                startActivity(intent);
+            case 4:
                 break;
-
-
-
-
         }
 
+        mDrawerList.setItemChecked(position, true);
+        setTitle(mMenuTitles[position]);
+        mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+
+
+
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getActionBar().setTitle(mTitle);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -144,8 +207,6 @@ public class MainActivity extends Activity implements OnClickListener {
         db.close();
         super.onDestroy();
     }
-
-
 
     @Override
     public void onBackPressed() {
@@ -169,20 +230,45 @@ public class MainActivity extends Activity implements OnClickListener {
         }
     }
 
-
-    private void showToast(){
-
-        Context context = getApplicationContext();
-
-        CharSequence text = "Pour quitter,\nappuyez à nouveau sur le bouton retour";
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.setGravity(Gravity.CENTER| Gravity.CENTER, 0, 0);
-
-        toast.show();
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // The action bar home/up action should open or close the drawer.
+        // ActionBarDrawerToggle will take care of this.
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        // Handle action buttons
+        switch(item.getItemId()) {
+            case R.id.action_websearch:
+                // create intent to perform web search for this planet
+                Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
+                // catch event that there's no activity to handle intent
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
 
 }
