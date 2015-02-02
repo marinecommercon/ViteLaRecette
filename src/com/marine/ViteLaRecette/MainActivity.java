@@ -101,8 +101,8 @@ public class MainActivity extends Activity implements OnClickListener {
                 startActivity(intent);
                 break;
 
-            case R.id.buttonAllRecipesID:
-                intent = new Intent(MainActivity.this, ActivityAllRecipes.class);
+            case R.id.buttonAddRecipeID:
+                intent = new Intent(MainActivity.this, ActivityAddRecipeStep1.class);
                 startActivity(intent);
                 break;
 
@@ -116,11 +116,11 @@ public class MainActivity extends Activity implements OnClickListener {
                 startActivity(intent);
                 break;
 
-            case R.id.buttonAddRecipeID:
-                intent = new Intent(MainActivity.this, ActivityAddRecipeStep1.class);
+
+            case R.id.buttonAllRecipesID:
+                intent = new Intent(MainActivity.this, ActivityAllRecipes.class);
                 startActivity(intent);
                 break;
-
 
 
 

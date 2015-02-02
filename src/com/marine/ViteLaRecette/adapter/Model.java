@@ -7,15 +7,7 @@ public class Model {
 
     private String name;
     private boolean selected;
-    private String quantity;
 
-    public String getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(String quantity) {
-        this.quantity = quantity;
-    }
 
     public Model(String name) {
         this.name = name;
