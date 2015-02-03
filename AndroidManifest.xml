@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.marine.ViteLaRecette"
-    android:versionCode="1"
-    android:versionName="1.0" >
+          package="com.marine.ViteLaRecette"
+          android:versionCode="1"
+          android:versionName="1.0" >
+
 
     <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="17" />
-    
+            android:minSdkVersion="14"
+            android:targetSdkVersion="17" />
+
+
 
     <application
-        android:allowBackup="true"
-        android:label="@string/app_name"
-        android:icon="@drawable/ic_launcher"
-        android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
-        
+            android:allowBackup="true"
+            android:label="@string/app_name"
+            android:icon="@drawable/ic_launcher">
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,54 +23,41 @@
             </intent-filter>
         </activity>
 
-
         <activity android:name=".ActivityAllRecipes"
-                  android:theme="@android:style/Theme.NoTitleBar"
                   android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".ActivityDetailRecipe"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name=".ActivityDetailRecipe">
         </activity>
 
-        <activity android:name=".ActivitySeeResults"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name=".ActivitySeeResults">
         </activity>
 
-        <activity android:name=".ActivityPersonalSearch"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name=".ActivityPersonalSearch">
         </activity>
 
-        <activity android:name="ActivityDetailRecipeSteps"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name="ActivityDetailRecipeSteps">
         </activity>
 
-        <activity android:name="ActivityAddRecipeStep1"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name="ActivityAddRecipeStep1">
         </activity>
 
-        <activity android:name="ActivityAddRecipeStep2"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name="ActivityAddRecipeStep2">
         </activity>
 
-        <activity android:name="ActivityAddRecipeStep3"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name="ActivityAddRecipeStep3">
         </activity>
 
-        <activity android:name="ActivityAddRecipeStep4"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name="ActivityAddRecipeStep4">
         </activity>
 
-        <activity android:name=".ActivityShoplist"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name=".ActivityShoplist">
         </activity>
 
-        <activity android:name=".ActivityPreferences"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name=".ActivityPreferences">
         </activity>
 
-        <activity android:name=".ActivityShoplistSteps"
-                  android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name=".ActivityShoplistSteps">
         </activity>
 
 
