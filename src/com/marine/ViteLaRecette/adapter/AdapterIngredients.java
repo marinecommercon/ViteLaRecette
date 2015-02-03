@@ -53,9 +53,9 @@ public class AdapterIngredients extends BaseAdapter {
 
 			holder = new ViewHolder();
 
-			convertView = inflater.inflate(R.layout.item_courses, null);
+			convertView = inflater.inflate(R.layout.item_ingredients, null);
 
-			holder.nom = (TextView) convertView.findViewById(R.id.nomsmall);
+			holder.nom = (TextView) convertView.findViewById(R.id.nom_ingredients);
 
 			convertView.setTag(holder);
 

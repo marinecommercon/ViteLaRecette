@@ -13,6 +13,7 @@ public class Liste {
 	private Long id;
 	private Integer nombre;
 	private Long recetteId;
+    private String tag;
 
 	/** Used to resolve relations */
 	private transient DaoSession daoSession;
@@ -36,6 +37,13 @@ public class Liste {
 		this.recetteId = recetteId;
 	}
 
+    public Liste(Long id, Integer nombre, Long recetteId, String tag) {
+        this.id = id;
+        this.nombre = nombre;
+        this.recetteId = recetteId;
+        this.tag = tag;
+    }
+
 	/** called by internal mechanisms, do not call yourself. */
 	public void __setDaoSession(DaoSession daoSession) {
 		this.daoSession = daoSession;
@@ -46,7 +54,7 @@ public class Liste {
 		return id;
 	}
 
-	public void setId(Long id) {
+    public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -65,6 +73,22 @@ public class Liste {
 	public void setRecetteId(Long recetteId) {
 		this.recetteId = recetteId;
 	}
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+
+
+
+
+
+
+
 
 	/** To-one relationship, resolved on first access. */
 	public Recette getRecette() {

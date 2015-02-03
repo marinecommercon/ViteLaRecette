@@ -68,6 +68,11 @@
                   android:theme="@android:style/Theme.NoTitleBar">
         </activity>
 
+        <activity android:name=".ActivityShoplistSteps"
+                  android:theme="@android:style/Theme.NoTitleBar">
+        </activity>
+
+
 
 
     </application>

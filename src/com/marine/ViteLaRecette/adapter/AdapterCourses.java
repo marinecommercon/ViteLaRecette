@@ -3,6 +3,7 @@ package com.marine.ViteLaRecette.adapter;
 import java.util.List;
 
 import com.marine.ViteLaRecette.R;
+import com.marine.ViteLaRecette.dao.Liste;
 import com.marine.ViteLaRecette.dao.Recette;
 
 
@@ -16,10 +17,10 @@ import android.widget.TextView;
 public class AdapterCourses extends BaseAdapter {
 
 	private static final Context Context = null;
-	List<Recette> liste;
+	List<Liste> liste;
 	LayoutInflater inflater;
 
-	public AdapterCourses(Context context, List<Recette> liste) {
+	public AdapterCourses(Context context, List<Liste> liste) {
 
 		inflater = LayoutInflater.from(context);
 
@@ -53,7 +54,8 @@ public class AdapterCourses extends BaseAdapter {
 
 			convertView = inflater.inflate(R.layout.item_courses, null);
 
-			holder.nom = (TextView) convertView.findViewById(R.id.nomsmall);
+			holder.nom_shoplist = (TextView) convertView.findViewById(R.id.nom_shoplist);
+            holder.nb_shoplist = (TextView) convertView.findViewById(R.id.nb_shoplist);
 
 			convertView.setTag(holder);
 
@@ -63,7 +65,17 @@ public class AdapterCourses extends BaseAdapter {
 
 		}
 
-		holder.nom.setText(liste.get(position).getNom());
+        if(!(liste.get(position).getRecette().getNom().equals(null))) {
+            holder.nom_shoplist.setText(liste.get(position).getRecette().getNom());
+
+        }
+
+
+        if(!(liste.get(position).getNombre().toString().equals(null))) {
+            holder.nb_shoplist.setText("pour " + liste.get(position).getNombre().toString() + " personnes");
+
+        }
+
 
 		return convertView;
 
@@ -71,7 +83,8 @@ public class AdapterCourses extends BaseAdapter {
 
 	private class ViewHolder {
 
-		TextView nom;
+		TextView nom_shoplist;
+        TextView nb_shoplist;
 
 	}
 

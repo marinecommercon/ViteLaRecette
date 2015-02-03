@@ -1,6 +1,7 @@
 package com.marine.ViteLaRecette;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -203,7 +204,11 @@ public class ActivityDetailRecipe extends Activity {
                         listViewIngredients.setAdapter(adapterListviewIngredients);
 
                          }
-                    Liste liste = new Liste(null, numberInt, recipe.getId());
+
+                    //Remember date and time to make the recipe unique
+                    Calendar c = Calendar.getInstance();
+
+                    Liste liste = new Liste(null, numberInt, recipe.getId(), c.getTime().toString());
                     MainActivity.listeDao.insert(liste);
 
                     showToast();

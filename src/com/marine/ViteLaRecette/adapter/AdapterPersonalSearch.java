@@ -50,8 +50,8 @@ public class AdapterPersonalSearch extends BaseAdapter {
 			holder = new ViewHolder();
 			convertView = inflater.inflate(R.layout.item_adapter_personal_search, null);
 
-			holder.nom = (TextView) convertView.findViewById(R.id.nom);
-            holder.type = (TextView) convertView.findViewById(R.id.type);
+			holder.nom_personal_search = (TextView) convertView.findViewById(R.id.nom_personal_search);
+            holder.type_personal_search = (TextView) convertView.findViewById(R.id.type_personal_search);
 
 			convertView.setTag(holder);
 
@@ -59,16 +59,16 @@ public class AdapterPersonalSearch extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		holder.nom.setText(liste.get(position).getNom());
-        holder.type.setText(liste.get(position).getType());
+		holder.nom_personal_search.setText(liste.get(position).getNom());
+        holder.type_personal_search.setText(liste.get(position).getType());
 
 		return convertView;
 
 	}
 
 	private class ViewHolder {
-		TextView nom;
-        TextView type;
+		TextView nom_personal_search;
+        TextView type_personal_search;
     }
 
 }
