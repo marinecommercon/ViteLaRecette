@@ -10,7 +10,6 @@ import android.app.FragmentManager;
 import android.content.res.Configuration;
 import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.view.*;
 import android.widget.AdapterView;
@@ -19,8 +18,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import com.marine.ViteLaRecette.dao.*;
 import com.marine.ViteLaRecette.database.MyDatabase;
-import com.marine.ViteLaRecette.fragment.FragmentAllRecipes;
-
+import com.marine.ViteLaRecette.fragment.AllRecipesFragment;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,13 +43,15 @@ public class MainActivity extends Activity {
     private MyDatabase dbImp;
     public static SQLiteDatabase db;
     private DaoMaster daoMaster;
-    static DaoSession daoSession;
+
+    public static DaoSession daoSession;
     public static RecetteDao recetteDao;
-    static QuantiteDao quantiteDao;
-    static IngredientDao ingredientDao;
-    static CategorieDao categorieDao;
-    static ListeDao listeDao;
-    static MesureDao mesureDao;
+    public static QuantiteDao quantiteDao;
+    public static IngredientDao ingredientDao;
+    public static CategorieDao categorieDao;
+    public static ListeDao listeDao;
+    public static MesureDao mesureDao;
+
     private int check;
     private Timer myTimer;
 
@@ -102,16 +102,10 @@ public class MainActivity extends Activity {
         }
 
 
-
-
-
-
         importBdd();
-
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "cookeasybdd", null);
         db = helper.getWritableDatabase();
-
 
         //init Daos 
         daoMaster = new DaoMaster(db);
@@ -122,11 +116,6 @@ public class MainActivity extends Activity {
         categorieDao = MainActivity.daoSession.getCategorieDao();
         listeDao = MainActivity.daoSession.getListeDao();
         mesureDao = MainActivity.daoSession.getMesureDao();
-
-
-
-
-
 
     }
 
@@ -186,9 +175,9 @@ public class MainActivity extends Activity {
 
 
             case 1:
-                fragment = new FragmentAllRecipes();
+                fragment = new AllRecipesFragment();
                 fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();;
                 break;
 
 
@@ -249,27 +238,31 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
 
+        if(getFragmentManager().getBackStackEntryCount() > 0){
+            getFragmentManager().popBackStack();}
 
-        check = check + 1;
+        //Detect timer
+        else
+        {
+            check = check + 1;
 
+            if (check == 1) {
+                showToast();
+                myTimer = new Timer();
+                myTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        check = 0;
+                    }
+                }, 2000);
+            }
 
-        if (check == 1) {
+            if(check==2){
+                finish();
+            }
 
-
-            showToast();
-            myTimer = new Timer();
-            myTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    check = 0;
-                }
-            }, 2000);
         }
 
-
-        if(check==2){
-            finish();
-        }
     }
 
 
@@ -282,7 +275,7 @@ public class MainActivity extends Activity {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
 
             default:
                 return super.onOptionsItemSelected(item);

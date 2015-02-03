@@ -4,6 +4,8 @@ package com.marine.ViteLaRecette.fragment;
  * Created by Marine on 03/02/2015.
  */
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -28,7 +30,7 @@ import com.marine.ViteLaRecette.dao.Recette;
 
 import java.util.ArrayList;
 
-public class FragmentAllRecipes extends android.app.ListFragment {
+public class AllRecipesFragment extends android.app.ListFragment {
 
     private Cursor cursor;
     private String textColumn;
@@ -43,7 +45,7 @@ public class FragmentAllRecipes extends android.app.ListFragment {
     public LinearLayout linearLayoutLetters;
 
 
-    public FragmentAllRecipes() {
+    public AllRecipesFragment() {
 
     }
 
@@ -70,10 +72,19 @@ public class FragmentAllRecipes extends android.app.ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+
+        Fragment fragment;
+        FragmentManager fragmentManager;
+        Bundle bundle = new Bundle();
+
         id = listRecipes.get(position).getId();
-        Intent intent = new Intent(getActivity(),ActivityDetailRecipe.class);
-        intent.putExtra("ID", (int) id);
-        startActivity(intent);
+        bundle.putInt("ID", (int) id);
+
+        fragment = new DetailRecipeFragment();
+        fragment.setArguments(bundle);
+
+        fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();;
     }
 
     private void findRecipes(){
