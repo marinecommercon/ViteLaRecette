@@ -46,6 +46,8 @@ public class ActivityDetailRecipe extends Activity {
 
         prefs = this.getSharedPreferences(TAG, MODE_PRIVATE);
         recetteID = this.getIntent().getIntExtra("ID", 0);
+
+
         setContentView(R.layout.activity_detail_recipe);
 
         recipe = MainActivity.recetteDao.queryBuilder()

@@ -19,6 +19,8 @@ import android.widget.Toast;
 import com.marine.ViteLaRecette.dao.*;
 import com.marine.ViteLaRecette.database.MyDatabase;
 import com.marine.ViteLaRecette.fragment.AllRecipesFragment;
+import com.marine.ViteLaRecette.fragment.DetailRecipeFragment;
+import com.marine.ViteLaRecette.fragment.PersonalSearchFragment;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -171,13 +173,21 @@ public class MainActivity extends Activity {
 
 
             case 0:
+                Bundle bundle = new Bundle();
+                bundle.putInt("ID", 5);
+
+                fragment = new DetailRecipeFragment();
+                fragment.setArguments(bundle);
+
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
                 break;
 
 
             case 1:
-                fragment = new AllRecipesFragment();
+                fragment = new PersonalSearchFragment();
                 fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();;
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
                 break;
 
 

@@ -6,7 +6,7 @@ package com.marine.ViteLaRecette.fragment;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Intent;
+import android.app.ListFragment;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -22,7 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.marine.ViteLaRecette.ActivityDetailRecipe;
 import com.marine.ViteLaRecette.MainActivity;
 import com.marine.ViteLaRecette.R;
 import com.marine.ViteLaRecette.adapter.AdapterPersonalSearch;
@@ -30,7 +29,7 @@ import com.marine.ViteLaRecette.dao.Recette;
 
 import java.util.ArrayList;
 
-public class AllRecipesFragment extends android.app.ListFragment {
+public class AllRecipesFragment extends ListFragment {
 
     private Cursor cursor;
     private String textColumn;
@@ -84,7 +83,7 @@ public class AllRecipesFragment extends android.app.ListFragment {
         fragment.setArguments(bundle);
 
         fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();;
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
     }
 
     private void findRecipes(){
