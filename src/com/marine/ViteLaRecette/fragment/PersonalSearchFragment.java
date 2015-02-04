@@ -1,6 +1,7 @@
 package com.marine.ViteLaRecette.fragment;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -65,22 +66,28 @@ public class PersonalSearchFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                intent = new Intent(getActivity(),
-                        ActivitySeeResults.class);
-                intent.putExtra("Type",String.valueOf(spinnerTypeOfDish.getSelectedItem()));
+
+                Fragment fragment;
+                FragmentManager fragmentManager;
+
+                Bundle bundle = new Bundle();
+                bundle.putString("Type", String.valueOf(spinnerTypeOfDish.getSelectedItem()));
+
+                fragment = new SeeResultsFragment();
+
                 if (autoCompIngredientA.getText().length() > 0) {
-                    intent.putExtra("IngredientA",
-                            ingredientExiste(autoCompIngredientA.getText()));
+                    bundle.putLong("IngredientA", ingredientExiste(autoCompIngredientA.getText()));
                 }
                 if (autoCompIngredientB.getText().length() > 0) {
-                    intent.putExtra("IngredientB",
-                            ingredientExiste(autoCompIngredientB.getText()));
+                    bundle.putLong("IngredientB", ingredientExiste(autoCompIngredientB.getText()));
                 }
                 if (autoCompIngredientC.getText().length() > 0) {
-                    intent.putExtra("IngredientC",
-                            ingredientExiste(autoCompIngredientC.getText()));
+                    bundle.putLong("IngredientC", ingredientExiste(autoCompIngredientC.getText()));
                 }
-                startActivity(intent);
+
+                fragment.setArguments(bundle);
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
             }
         });
     }
