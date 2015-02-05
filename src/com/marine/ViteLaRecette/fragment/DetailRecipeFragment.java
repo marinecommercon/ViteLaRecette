@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import com.marine.ViteLaRecette.ActivityDetailRecipeSteps;
 import com.marine.ViteLaRecette.MainActivity;
 import com.marine.ViteLaRecette.R;
 import com.marine.ViteLaRecette.dao.Liste;
@@ -64,8 +62,8 @@ public class DetailRecipeFragment extends ListFragment {
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             recetteID = bundle.getInt("ID", 0);
-            System.out.println("détail" + recetteID);
         }
+
         prefs = getActivity().getSharedPreferences(TAG, Context.MODE_PRIVATE);
 
         recipe = MainActivity.recetteDao.queryBuilder()

@@ -18,10 +18,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import com.marine.ViteLaRecette.dao.*;
 import com.marine.ViteLaRecette.database.MyDatabase;
-import com.marine.ViteLaRecette.fragment.AllRecipesFragment;
-import com.marine.ViteLaRecette.fragment.DetailRecipeFragment;
-import com.marine.ViteLaRecette.fragment.PersonalSearchFragment;
-import com.marine.ViteLaRecette.fragment.PreferencesFragment;
+import com.marine.ViteLaRecette.fragment.*;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -174,36 +171,37 @@ public class MainActivity extends Activity {
 
 
             case 0:
-                fragment = new PreferencesFragment();
-                fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
-                break;
-
-
-            case 1:
                 fragment = new PersonalSearchFragment();
                 fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
                 break;
 
 
+            case 1:
+                fragment = new AllRecipesFragment();
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
+                break;
+
+
             case 2:
-                Bundle bundle = new Bundle();
-                bundle.putInt("ID", 5);
-
-                fragment = new DetailRecipeFragment();
-                fragment.setArguments(bundle);
-
+                fragment = new PreferencesFragment();
                 fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
                 break;
 
 
             case 3:
+                fragment = new ShoplistFragment();
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
                 break;
 
 
             case 4:
+                fragment = new AddRecipeStep1Fragment();
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
                 break;
         }
 

@@ -12,7 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Spinner;
-import com.marine.ViteLaRecette.ActivitySeeResults;
 import com.marine.ViteLaRecette.MainActivity;
 import com.marine.ViteLaRecette.R;
 import com.marine.ViteLaRecette.dao.Ingredient;

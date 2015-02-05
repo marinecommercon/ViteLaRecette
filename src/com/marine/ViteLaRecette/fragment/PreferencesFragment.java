@@ -3,24 +3,21 @@ package com.marine.ViteLaRecette.fragment;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.ListFragment;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import com.marine.ViteLaRecette.ActivityDetailRecipe;
 import com.marine.ViteLaRecette.MainActivity;
 import com.marine.ViteLaRecette.R;
 import com.marine.ViteLaRecette.adapter.AdapterPersonalSearch;
-import com.marine.ViteLaRecette.dao.*;
+import com.marine.ViteLaRecette.dao.Categorie;
+import com.marine.ViteLaRecette.dao.Ingredient;
+import com.marine.ViteLaRecette.dao.Recette;
+import com.marine.ViteLaRecette.dao.RecetteDao;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -258,9 +255,18 @@ public class PreferencesFragment extends Fragment {
                 alert.setButton3("Detail",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                Intent intent1 = new Intent(getActivity(), ActivityDetailRecipe.class);
-                                intent1.putExtra("ID", listFavoriteRecipes.get(arg2).getId().intValue());
-                                startActivity(intent1);
+
+                                Fragment fragment;
+                                FragmentManager fragmentManager;
+                                Bundle bundle = new Bundle();
+
+                                bundle.putInt("ID", (int) listFavoriteRecipes.get(arg2).getId().intValue());
+
+                                fragment = new DetailRecipeFragment();
+                                fragment.setArguments(bundle);
+
+                                fragmentManager = getFragmentManager();
+                                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
                             }
                         });
 
@@ -314,9 +320,17 @@ public class PreferencesFragment extends Fragment {
                 alert.setButton3("Détail",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                Intent intent1 = new Intent(getActivity(), ActivityDetailRecipe.class);
-                                intent1.putExtra("ID", listBannedRecipes.get(arg2).getId().intValue());
-                                startActivity(intent1);
+                                Fragment fragment;
+                                FragmentManager fragmentManager;
+                                Bundle bundle = new Bundle();
+
+                                bundle.putInt("ID", (int) listBannedRecipes.get(arg2).getId().intValue());
+
+                                fragment = new DetailRecipeFragment();
+                                fragment.setArguments(bundle);
+
+                                fragmentManager = getFragmentManager();
+                                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
                             }
                         });
 
