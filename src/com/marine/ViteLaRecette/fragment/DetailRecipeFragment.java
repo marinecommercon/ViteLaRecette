@@ -71,6 +71,7 @@ public class DetailRecipeFragment extends ListFragment {
                 .unique();
 
         listOfIngredients = MainActivity.quantiteDao._queryRecette_QuantDeRec(recetteID);
+
         initQuantity(listOfIngredients, quantities);
 
     }

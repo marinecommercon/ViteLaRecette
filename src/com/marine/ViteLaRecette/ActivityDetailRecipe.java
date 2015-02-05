@@ -132,7 +132,6 @@ public class ActivityDetailRecipe extends Activity {
 
 
         // Button AddShoplist => Adapt the quantities
-
         alertDialogChangeQuantity.setView(numberChoosenByUser);
         alertDialogChangeQuantity.setButton(DialogInterface.BUTTON_POSITIVE, "Ajuster les quantites", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -172,7 +171,6 @@ public class ActivityDetailRecipe extends Activity {
 
 
         // Button AddShoplist => Adapt and add to the shoplist
-
         alertDialogChangeQuantity.setButton(DialogInterface.BUTTON_NEGATIVE, "Ajouter a la \n liste de course", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 

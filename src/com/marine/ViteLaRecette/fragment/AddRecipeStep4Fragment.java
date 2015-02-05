@@ -1,22 +1,25 @@
-package com.marine.ViteLaRecette;
+package com.marine.ViteLaRecette.fragment;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import com.marine.ViteLaRecette.dao.*;
+import com.marine.ViteLaRecette.MainActivity;
+import com.marine.ViteLaRecette.R;
+import com.marine.ViteLaRecette.dao.Quantite;
+import com.marine.ViteLaRecette.dao.Recette;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Created by mcommercon on 09/10/14.
+ * Created by Marine on 05/02/2015.
  */
-public class ActivityAddRecipeStep4 extends Activity {
+public class AddRecipeStep4Fragment extends Fragment {
 
     private Button buttonCancel;
     private Button buttonAdd;
@@ -55,56 +58,59 @@ public class ActivityAddRecipeStep4 extends Activity {
     private ArrayAdapter<String> adapterListviewIngredients;
     private TextView textViewDescription;
 
-
-
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_recipe_step4);
 
-        initUI(this);
 
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.activity_add_recipe_step4, container, false);
+
+        buttonCancel = (Button) rootView.findViewById(R.id.buttonCancel);
+        buttonAdd = (Button) rootView.findViewById(R.id.buttonAdd);
+        textViewName = (TextView) rootView.findViewById(R.id.textViewNameID);
+        textViewType = (TextView) rootView.findViewById(R.id.textViewTypeID);
+        textViewNumber = (TextView) rootView.findViewById(R.id.textViewNumberID);
+        textViewPreparationTime = (TextView) rootView.findViewById(R.id.textViewPreparationTimeID);
+        textViewCookingTime = (TextView) rootView.findViewById(R.id.textViewCookingTimeID);
+        textViewDifficulty = (TextView) rootView.findViewById(R.id.textViewDifficultyID);
+        textViewPrice = (TextView) rootView.findViewById(R.id.textViewPriceID);
+        textViewDescription = (TextView) rootView.findViewById(R.id.textViewDescriptionID);
+        listViewIngredients = (ListView)rootView.findViewById(R.id.listViewIngredientsID);
+
+        initUI(getActivity());
+        return rootView;
+    }
 
     protected void initUI(Activity a) {
 
         //Init button
-        buttonCancel = (Button) findViewById(R.id.buttonCancel);
         buttonCancel.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(ActivityAddRecipeStep4.this,MainActivity.class);
+                Intent intent = new Intent(getActivity(), MainActivity.class);
                 startActivity(intent);
             }
         });
 
-        buttonAdd = (Button) findViewById(R.id.buttonAdd);
         buttonAdd.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
                 addRecipe();
-                Toast.makeText(getApplicationContext(), "Recette ajoutée", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(ActivityAddRecipeStep4.this,MainActivity.class);
+                Toast.makeText(getActivity().getApplicationContext(), "Recette ajoutée", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(),MainActivity.class);
                 startActivity(intent);
 
             }
         });
-
-        //add elements to the UI
-        textViewName = (TextView) findViewById(R.id.textViewNameID);
-        textViewType = (TextView) findViewById(R.id.textViewTypeID);
-        textViewNumber = (TextView) findViewById(R.id.textViewNumberID);
-        textViewPreparationTime = (TextView) findViewById(R.id.textViewPreparationTimeID);
-        textViewCookingTime = (TextView) findViewById(R.id.textViewCookingTimeID);
-        textViewDifficulty = (TextView) findViewById(R.id.textViewDifficultyID);
-        textViewPrice = (TextView) findViewById(R.id.textViewPriceID);
-        textViewDescription = (TextView) findViewById(R.id.textViewDescriptionID);
 
         initValues();
 
@@ -115,6 +121,7 @@ public class ActivityAddRecipeStep4 extends Activity {
         getPrefs();
         for (int i=0 ; i<dbListQuantities.size() ; i++){addFullIngredient(i);}
 
+
         textViewName.setText(name);
         textViewType.setText(type);
         textViewNumber.setText(""+number);
@@ -124,8 +131,7 @@ public class ActivityAddRecipeStep4 extends Activity {
         textViewPrice.setText(price);
         textViewDescription.setText(steps);
 
-        listViewIngredients = (ListView) findViewById(R.id.listViewIngredientsID);
-        adapterListviewIngredients = new ArrayAdapter<String>(this, R.layout.item_petit, listFullIngredientsString);
+        adapterListviewIngredients = new ArrayAdapter<String>(getActivity(), R.layout.item_petit, listFullIngredientsString);
         listViewIngredients.setAdapter(adapterListviewIngredients);
         resizeListviewIngredients();
     }
@@ -146,7 +152,7 @@ public class ActivityAddRecipeStep4 extends Activity {
     }
 
     private void getPrefs(){
-        preferences =  getApplicationContext().getSharedPreferences("ADD_RECIPE", 0);
+        preferences =  getActivity().getApplicationContext().getSharedPreferences("ADD_RECIPE", 0);
         name = preferences.getString("ADD_RECIPE_NAME", "");
         type = preferences.getString("ADD_RECIPE_TYPE", "");
         number = preferences.getInt("ADD_RECIPE_NUMBER", 0);
@@ -161,15 +167,15 @@ public class ActivityAddRecipeStep4 extends Activity {
 
         for (int i = 0; i < sizeQuantities; i++) {
 
-                dbListQuantities.add(""+preferences.getString("Quantities_" + i, "").toString());
-                dbListUnits.add(""+preferences.getString("Units_" + i, "").toString());
-                dbListIngredients.add(""+preferences.getString("Ingredients_" + i, "").toString());
-            }
+            dbListQuantities.add(""+preferences.getString("Quantities_" + i, "").toString());
+            dbListUnits.add(""+preferences.getString("Units_" + i, "").toString());
+            dbListIngredients.add(""+preferences.getString("Ingredients_" + i, "").toString());
+        }
     }
 
     private void addFullIngredient(int i){
 
-        Quantite fullIngredient = new Quantite();
+        fullIngredient = new Quantite();
 
         fullIngredient.setQuantite((float) Integer.parseInt(dbListQuantities.get(i)));
         fullIngredient.setMesureId((long) Integer.parseInt(dbListUnits.get(i)));
@@ -238,5 +244,4 @@ public class ActivityAddRecipeStep4 extends Activity {
         listViewIngredients.setLayoutParams(params);
 
     }
-
 }
